@@ -1,0 +1,14 @@
+@font-face {
+    font-family: CircularXX;
+    src: url(./fonts/CircularXX.woff2);
+}
+
+html {
+    font-family: CircularXX, sans-serif;
+}
+
+body {
+    background-color: #1e1e1e;
+    color: #fff;
+    margin: 0;
+}
