@@ -14,13 +14,10 @@ export const Register: FC = () => {
         Object.fromEntries(new FormData(event.currentTarget))
       ),
     }).then((response) => {
-      console.log(response.headers);
       if (response.status === 201) {
         window.location.href = "/";
-      } else if (response.status === 409) {
-        alert("Username or email already taken.");
       } else {
-        alert("Registration failed.");
+        document.getElementById("server_message")!.innerHTML = response.statusText;
       }
     });
   };
@@ -91,6 +88,12 @@ export const Register: FC = () => {
       transform: translate(-50%, -50%);
     `}>
       <h1>Register</h1>
+      
+      <div id="server_message" className={css`
+        color: red;
+        font-weight: bold;
+      `} />
+
       <form onSubmit={submitForm} className={css`
         display: flex;
         flex-direction: column;
