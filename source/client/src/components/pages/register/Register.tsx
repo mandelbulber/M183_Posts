@@ -27,8 +27,9 @@ export const Register: FC = () => {
     const emailValid = email !== "" && email!.includes("@") && email!.includes(".");
     const usernameValid = (document.getElementById("username") as HTMLInputElement).value != "";
     const passwordValid = checkPassword((document.getElementById("password") as HTMLInputElement).value);
+    const phoneNumberValid = (document.getElementById("phoneNumber") as HTMLInputElement).value != "";
 
-    if (emailValid && usernameValid && passwordValid) {
+    if (emailValid && usernameValid && passwordValid && phoneNumberValid) {
       document.getElementById("submit")!.removeAttribute("disabled");
     } else {
       document.getElementById("submit")!.setAttribute("disabled", "true");
@@ -110,8 +111,16 @@ export const Register: FC = () => {
         <input id="username" type="text" onChange={checkInput} name="username" placeholder="Username" />
         <input id="email" type="email" onChange={checkInput} name="email" placeholder="Email" />
         <input id="password" type="password" onChange={checkInput} name="password" placeholder="Password" />
+        <input id="phoneNumber" type="tel" onChange={checkInput} name="phoneNumber" placeholder="Phone Number" />
         <input id="submit" type="submit" value="Register" disabled/>
       </form>
+      
+      <a href="/login" className={css`
+        margin-top: 1rem;
+        margin-bottom: 2rem;
+        color: grey;
+        text-decoration: underline;
+      `}>Already have an account?</a>
 
       <h4 id="pw_req_title">Password Requirements</h4>
       <div id="pw_req_length">12 characters</div>

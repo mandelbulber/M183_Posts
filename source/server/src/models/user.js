@@ -24,10 +24,22 @@ User.init({
         type: DataTypes.STRING,
         allowNull: false
     },
+    phoneNumber: {
+        type: DataTypes.STRING,
+        allowNull: false
+    },
     role: {
         type: DataTypes.STRING,
         defaultValue: 'user'
-    }
+    },
+    smsToken: {
+        type: DataTypes.STRING,
+        allowNull: true
+    },
+    smsTokenCreatedAt: {
+        type: DataTypes.DATE,
+        allowNull: true
+    },
 }, {
     sequelize,
     modelName: 'user'

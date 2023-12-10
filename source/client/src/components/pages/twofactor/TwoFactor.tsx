@@ -1,9 +1,10 @@
 import { css } from "@emotion/css";
 import { FC } from "react";
-export const Login: FC = () => {
-  const submitForm = (event: React.FormEvent<HTMLFormElement>) => {
+
+export const TwoFactor: FC = () => {
+  const sumbitForm = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    fetch("/api/auth/login", {
+    fetch("/api/auth/verify", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -13,7 +14,7 @@ export const Login: FC = () => {
       ),
     }).then((response) => {
       if (response.status === 200) {
-        window.location.href = "/verify";
+        window.location.href = "/profile";
       } else {
         document.getElementById("server_message")!.innerHTML = response.statusText;
       }
@@ -32,14 +33,10 @@ export const Login: FC = () => {
       left: 50%;
       transform: translate(-50%, -50%);
     `}>
-      <h1>Login</h1>
+      <h1>Verify your identity</h1>
+      <p>Enter your sms code</p>
 
-      <div id="server_message" className={css`
-        color: red;
-        font-weight: bold;
-      `} />
-
-      <form onSubmit={submitForm} className={css`
+      <form onSubmit={sumbitForm} className={css`
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -52,16 +49,13 @@ export const Login: FC = () => {
           border-radius: 0.5rem;
         }
       `}>
-        <input type="text" name="username" placeholder="Username" />
-        <input type="password" name="password" placeholder="Password" />
-        <input type="submit" value="Login" />
+        <div id="server_message" className={css`
+          color: red;
+          font-weight: bold;
+        `} />
+        <input type="text" name="code" placeholder="Code" />
+        <input type="submit" value="Verify" />
       </form>
-      <a href="/register" className={css`
-        margin-top: 1rem;
-        margin-bottom: 2rem;
-        color: grey;
-        text-decoration: underline;
-      `}>Don't have an account yet?</a>
     </div>
   );
 };

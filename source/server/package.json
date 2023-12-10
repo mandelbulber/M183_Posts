@@ -12,7 +12,10 @@
   "license": "ISC",
   "dependencies": {
     "bcrypt": "^5.1.1",
+    "cookie-parser": "^1.4.6",
+    "dotenv": "^16.3.1",
     "express": "^4.18.2",
+    "jsonwebtoken": "^9.0.2",
     "sequelize": "^6.35.1",
     "sqlite3": "^5.1.6",
     "validator": "^13.11.0"
