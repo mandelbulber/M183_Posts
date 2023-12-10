@@ -157,17 +157,15 @@ export const sendSmsToken = async (username, smsToken) => {
     });
 }
 
-export const cookieJwtAuth = async (req, res, next) => {
+export const cookieJwtAuth = async (req, res) => {
     console.log('Checking if user is authenticated');
     
-    try {
-        const decoded = jwt.verify(req.cookies.jwt, process.env.JWT_SECRET);
-        req.userData = decoded;
-        next();
+    if (req.cookies.jwt) {
+        req.userData = jwt.verify(req.cookies.jwt, process.env.JWT_SECRET);
+        return true;
     }
-    catch (err) {
-        console.log(err);
+    else{
         res.clearCookie('jwt');
-        res.status(401).end(); // 401 unauthorized
+        return false;
     }
 }

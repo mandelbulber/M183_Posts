@@ -121,10 +121,18 @@ authRouter.post('/logout', (req, res) => {
     res.status(200).end(); // 200 ok
 });
 
-authRouter.get('/isAuthenticated', cookieJwtAuth, (req, res) => {
-    res.status(200).end(); // 200 ok
+authRouter.get('/isAuthenticated', async (req, res) => {
+    const loggedIn = await cookieJwtAuth(req, res);
+    if (loggedIn)
+        res.send(true);
+    else
+        res.send(false);
 });
 
-authRouter.get('/profile', cookieJwtAuth, async (req, res) => {
-    res.status(200).json(await getUserDetails(req.userData.username)); // 200 ok
+authRouter.get('/profile', async (req, res) => {
+    const loggedIn = await cookieJwtAuth(req, res);
+    if (loggedIn)
+        res.status(200).json(await getUserDetails(req.userData.username)); // 200 ok
+    else
+        res.status(401).end(); // 401 unauthorized
 });

@@ -12,11 +12,9 @@ export const Navigation: FC = () => {
         "Content-Type": "application/json",
       },
     }).then((response) => {
-      if (response.status === 200) {
-        setLoggedIn(true);
-      } else {
-        setLoggedIn(false);
-      }
+      response.json().then((data) => {
+        setLoggedIn(data);
+      });
     });
   }, []);
 
