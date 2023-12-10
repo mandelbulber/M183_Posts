@@ -116,11 +116,15 @@ authRouter.post('/verify', (req, res) => {
     res.status(200).end(); // 200 ok
 });
 
-authRouter.get('/profile', cookieJwtAuth, async (req, res) => {
-    res.status(200).json(await getUserDetails(req.userData.username)); // 200 ok
-});
-
 authRouter.post('/logout', (req, res) => {
     res.clearCookie('jwt');
     res.status(200).end(); // 200 ok
+});
+
+authRouter.get('/isAuthenticated', cookieJwtAuth, (req, res) => {
+    res.status(200).end(); // 200 ok
+});
+
+authRouter.get('/profile', cookieJwtAuth, async (req, res) => {
+    res.status(200).json(await getUserDetails(req.userData.username)); // 200 ok
 });

@@ -1,11 +1,33 @@
 import { css } from "@emotion/css";
-import { FC, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import { redirect } from "react-router-dom";
 
 export const Navigation: FC = () => {
   const [loggedIn, setLoggedIn] = useState(false);
 
+  useEffect(() => {
+    fetch("/api/auth/isAuthenticated", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }).then((response) => {
+      if (response.status === 200) {
+        setLoggedIn(true);
+      } else {
+        setLoggedIn(false);
+      }
+    });
+  }, []);
+
   const logout = () => {
+    fetch("/api/auth/logout", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
     setLoggedIn(false);
     redirect("/");
     // todo: logout

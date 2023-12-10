@@ -14,7 +14,6 @@ export const Profile: FC = () => {
         window.location.href = "/login";
       } else {
         response.json().then((data) => {
-          console.log(data);
           setUser(data);
         });
       }

@@ -107,8 +107,6 @@ export const getUserDetails = async (username) => {
         },
         attributes: ['username', 'email', 'phoneNumber']
     }).then((user) => {
-        console.log('User details found');
-        console.log(user.dataValues);
         return user.dataValues;
     }).catch((err) => {
         console.log(err);
