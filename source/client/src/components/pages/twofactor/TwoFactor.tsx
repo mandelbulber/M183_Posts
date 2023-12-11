@@ -9,9 +9,10 @@ export const TwoFactor: FC = () => {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(
-        Object.fromEntries(new FormData(event.currentTarget))
-      ),
+      body: JSON.stringify({
+        smsToken: Object.fromEntries(new FormData(event.currentTarget)).code,
+        username: localStorage.getItem("username"),
+      }),
     }).then((response) => {
       if (response.status === 200) {
         window.location.href = "/profile";

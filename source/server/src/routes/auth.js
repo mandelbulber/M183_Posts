@@ -9,23 +9,23 @@ authRouter.post('/register', async (req, res) => {
     const { username, email, password, phoneNumber } = req.body;
 
     // check if all parameters are provided
-    if (!username || !email || !password || !phoneNumber){
+    if (!username || !email || !password || !phoneNumber) {
         res.statusMessage = 'Missing parameters';
         return res.status(400).end(); // 400 bad request
     }
 
     // check if email and password are valid [req. 2.2]
-    if (!validator.isEmail(email)){
+    if (!validator.isEmail(email)) {
         res.statusMessage = 'Invalid email';
         return res.status(400).end(); // 400 bad request
     }
-    if (!validator.isStrongPassword(password, { minLength: 12, minLowercase: 1, minUppercase: 1, minNumbers: 1, minSymbols: 1 } )) {
+    if (!validator.isStrongPassword(password, { minLength: 12, minLowercase: 1, minUppercase: 1, minNumbers: 1, minSymbols: 1 })) {
         res.statusMessage = 'Password not strong enough';
         return res.status(400).end(); // 400 bad request
     }
 
     // check if phone number is valid
-    if (!validator.isMobilePhone(phoneNumber, 'de-CH', { strictMode: true })){
+    if (!validator.isMobilePhone(phoneNumber, 'de-CH', { strictMode: true })) {
         res.statusMessage = 'Invalid phone number';
         return res.status(400).end(); // 400 bad request
     }
@@ -34,15 +34,15 @@ authRouter.post('/register', async (req, res) => {
     const emailUsed = await checkEmailUsed(email);
     const usernameUsed = await checkUsernameUsed(username);
 
-    if (emailUsed && usernameUsed){
+    if (emailUsed && usernameUsed) {
         res.statusMessage = 'Email and username already used';
         return res.status(409).end(); // 409 conflict
     }
-    else if (emailUsed){
+    else if (emailUsed) {
         res.statusMessage = 'Email already used';
         return res.status(409).end(); // 409 conflict
     }
-    else if (usernameUsed){
+    else if (usernameUsed) {
         res.statusMessage = 'Username already used';
         return res.status(409).end(); // 409 conflict
     }
@@ -55,23 +55,22 @@ authRouter.post('/register', async (req, res) => {
     });
 });
 
-authRouter.post('/login', (req, res) => {
+authRouter.post('/login', async (req, res) => {
     const { username, password } = req.body;
 
     // check if all parameters are provided
-    if (!username || !password){
+    if (!username || !password) {
         res.statusMessage = 'Missing parameters';
         return res.status(400).end(); // 400 bad request
     }
 
-    // check if username exists [req. 2.4]
-    const usernameUsed = checkUsernameUsed(username);
-    if (!usernameUsed){
-        res.statusMessage = 'Username not found';
-        return res.status(404).end(); // 404 not found
+    // check if username exists and matches with password [req. 2.4]
+    const userExists = await checkUsernameUsed(username);
+    const passwordCorrect = await checkPasswordCorrect(username, password);
+    if (!userExists || !passwordCorrect) {
+        res.statusMessage = 'Username or password incorrect';
+        return res.status(401).end(); // 401 unauthorized
     }
-
-    // ToDo: check password at what point?
 
     // generate sms-token
     const smsToken = Math.floor(100000 + Math.random() * 900000)
@@ -91,28 +90,25 @@ authRouter.post('/login', (req, res) => {
     });
 });
 
-authRouter.post('/verify', (req, res) => {
-    //const { username, password, smsToken } = req.body;
+authRouter.post('/verify', async (req, res) => {
+    const { username, smsToken } = req.body;
 
-    // check if all parameters are provided
-    // if (!username || !smsToken){
-    //     res.statusMessage = 'Missing parameters';
-    //     return res.status(400).end(); // 400 bad request
-    // }
+    //check if all parameters are provided
+    if (!username || !smsToken) {
+        res.statusMessage = 'Missing parameters';
+        return res.status(400).end(); // 400 bad request
+    }
 
-    // // check if username, password and sms-token match [req. 2.9]
-    // const passwordCorrect = checkPasswordCorrect(username, password);
-    // const smsTokenCorrect = checkSmsTokenCorrect(username, smsToken);
-
-    // if (!passwordCorrect || !smsTokenCorrect){
-    //     res.statusMessage = 'Wrong password or sms-token';
-    //     return res.status(401).end(); // 401 unauthorized
-    // }
+    // check if username and sms-token match [req. 2.9]
+    if (!await checkSmsTokenCorrect(username, smsToken)) {
+        res.statusMessage = 'SMS-Code doesn\'t match user';
+        return res.status(401).end(); // 401 unauthorized
+    }
 
     // generate jwt
-    const token = jwt.sign({ username: "username" }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    const token = jwt.sign({ username: username }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
-    res.cookie('jwt', token, { httpOnly: true, secure: true});
+    res.cookie('jwt', token, { httpOnly: true, secure: true });
     res.status(200).end(); // 200 ok
 });
 

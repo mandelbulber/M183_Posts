@@ -31,16 +31,31 @@ export const checkUsernameUsed = async (username) => {
 }
 
 export const checkPasswordCorrect = async (username, password) => {
-    console.log('Checking if password is correct');
+    console.log('Checking if password is correct asjdjasdjdjdjdjdjd');
 
-    if (await bcrypt.compare(password, (await User.findOne({
+    // get hashed password from database
+    const hashedPassword = await User.findOne({
         where: {
             username: username,
-        }
-    })).password))
-        return true;
-    else
-        return false;
+        },
+        attributes: ['password']
+    }).then((password) => {
+        if (password)
+            return password.dataValues.password;
+        else
+            return null;
+    }).catch((err) => {
+        console.log(err);
+        throw err;
+    });
+
+    // compare passwords
+    if (hashedPassword) {
+        if (await bcrypt.compare(password, hashedPassword))
+            return true;
+        else
+            return false;
+    }
 }
 
 export const checkSmsTokenCorrect = async (username, smsToken) => {
@@ -55,7 +70,7 @@ export const checkSmsTokenCorrect = async (username, smsToken) => {
         where: {
             username: username,
         }
-    })).smsTokenCreatedAt) < 300000){
+    })).smsTokenCreatedAt) < 300000) {
         // delete sms token
         await User.update({
             smsToken: null,
@@ -134,7 +149,7 @@ export const saveSmsToken = async (username, smsToken) => {
 
 export const sendSmsToken = async (username, smsToken) => {
     console.log('Sending sms token');
-    
+
     // get phone number for username
     const user = await User.findOne({
         where: {
@@ -146,7 +161,7 @@ export const sendSmsToken = async (username, smsToken) => {
         "mobileNumber": user.phoneNumber.substring(1),
         "message": "Your sms token is: " + smsToken + "."
     };
-      
+
     fetch('https://m183.gibz-informatik.ch/api/sms/message', {
         method: 'POST',
         headers: {
@@ -159,12 +174,12 @@ export const sendSmsToken = async (username, smsToken) => {
 
 export const cookieJwtAuth = async (req, res) => {
     console.log('Checking if user is authenticated');
-    
+
     if (req.cookies.jwt) {
         req.userData = jwt.verify(req.cookies.jwt, process.env.JWT_SECRET);
         return true;
     }
-    else{
+    else {
         res.clearCookie('jwt');
         return false;
     }

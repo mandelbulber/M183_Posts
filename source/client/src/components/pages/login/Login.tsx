@@ -3,13 +3,15 @@ import { FC } from "react";
 export const Login: FC = () => {
   const submitForm = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    const userInputs = Object.fromEntries(new FormData(event.currentTarget));
+    localStorage.setItem("username", userInputs.username.toString());
     fetch("/api/auth/login", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(
-        Object.fromEntries(new FormData(event.currentTarget))
+        userInputs
       ),
     }).then((response) => {
       if (response.status === 200) {
