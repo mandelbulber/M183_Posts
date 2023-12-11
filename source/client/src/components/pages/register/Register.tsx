@@ -42,7 +42,7 @@ export const Register: FC = () => {
     let uppercaseMet = /[A-Z]/.test(password);
     let lowercaseMet = /[a-z]/.test(password);
     let numberMet = /[0-9]/.test(password);
-    let specialMet = /[!@#$%^&*]/.test(password);
+    let specialMet = /[^A-Za-z0-9]/.test(password);
 
     // hide met requirements
     if (lengthMet)
