@@ -1,4 +1,5 @@
 import { User } from '../models/user.js';
+import { Role } from '../models/role.js';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 
@@ -99,12 +100,22 @@ export const createUser = async (username, email, password, phoneNumber) => {
     // create user
     console.log('hashing password');
     const hashedPassword = await bcrypt.hash(password, 10);
-    await User.create({
-        username,
-        email,
-        password: hashedPassword,
-        phoneNumber,
-        role: 'user' // always user, if account created via api
+    await User.findOrCreate({
+        where: {
+            username: username,
+            email: email,
+            password: hashedPassword,
+            phoneNumber: phoneNumber,
+        },
+    }).then((user) => {
+        Role.findOne({
+            where: {name: 'user'}, 
+        }).then((role) => {
+            user[0].setRole(role);
+        }).catch((err) => {
+            console.log(err);
+            throw err;
+        });
     }).then(() => {
         console.log('User created');
     }).catch((err) => {
@@ -166,7 +177,7 @@ export const sendSmsToken = async (username, smsToken) => {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'X-Api-Key': 'MgAyADgAOQA1ADIAOQA1ADMAMwAwADYAMgAyADgANQA5ADkA',
+            'X-Api-Key': process.env.GIBZ_API_KEY,
         },
         body: JSON.stringify(payload),
     });
