@@ -31,4 +31,4 @@ For the sake of fulfilling the requirement 8.4, two users will be seeded for tes
 | Admin | username | \#S3$UZe2K2*xjG |
 | User  | admin    | \#S3$UZe2K2*xjG |
 
-As already mentioned, the phone numbers for those users is defined using environment variables that are defined in the [.env-File](./server/.env). Make sure to change these accordingly before the seeding happens, in order to receive the 2FA SMS token.
+As already mentioned, the phone numbers for those users is defined using environment variables that are defined in the [.env-File](./source/server/.env). Make sure to change these accordingly before the seeding happens, in order to receive the 2FA SMS token.
