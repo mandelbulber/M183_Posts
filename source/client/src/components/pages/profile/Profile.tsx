@@ -10,12 +10,12 @@ export const Profile: FC = () => {
         "Content-Type": "application/json",
       },
     }).then((response) => {
-      if (response.status === 401) {
-        window.location.href = "/login";
-      } else {
+      if (response.status === 200) {
         response.json().then((data) => {
           setUser(data);
         });
+      } else {
+        window.location.href = "/login";
       }
     });
   }, []);
