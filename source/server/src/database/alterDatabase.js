@@ -87,8 +87,8 @@ export const seedDatabase = async () => {
     }).then(async (user) => {
         await Role.findOne({
             where: {name: 'user'}, 
-        }).then((role) => {
-            user[0].setRole(role);
+        }).then(async (role) => {
+            await user[0].setRole(role);
         }).catch((err) => {
             console.log(err);
             throw err;
@@ -111,8 +111,8 @@ export const seedDatabase = async () => {
     }).then(async (user) => {
         await Role.findOne({
             where: {name: 'admin'}, 
-        }).then((role) => {
-            user[0].setRole(role);
+        }).then(async (role) => {
+            await user[0].setRole(role);
         }).catch((err) => {
             console.log(err);
             throw err;
@@ -133,16 +133,16 @@ export const seedDatabase = async () => {
     }).then(async (post) => {
         await Status.findOne({
             where: {name: 'published'}, 
-        }).then((status) => {
-            post[0].setStatus(status);
+        }).then(async (status) => {
+            await post[0].setStatus(status);
         }).catch((err) => {
             console.log(err);
             throw err;
         });
         await User.findOne({
             where: {username: 'username'}, 
-        }).then((user) => {
-            post[0].setUser(user);
+        }).then(async (user) => {
+            await post[0].setUser(user);
         }).catch((err) => {
             console.log(err);
             throw err;
@@ -162,16 +162,16 @@ export const seedDatabase = async () => {
     }).then(async (post) => {
         await Status.findOne({
             where: {name: 'deleted'}, 
-        }).then((status) => {
-            post[0].setStatus(status);
+        }).then(async (status) => {
+            await post[0].setStatus(status);
         }).catch((err) => {
             console.log(err);
             throw err;
         });
         await User.findOne({
             where: {username: 'username'}, 
-        }).then((user) => {
-            post[0].setUser(user);
+        }).then(async (user) => {
+            await post[0].setUser(user);
         }).catch((err) => {
             console.log(err);
             throw err;
@@ -191,16 +191,16 @@ export const seedDatabase = async () => {
     }).then(async (post) => {
         await Status.findOne({
             where: {name: 'hidden'}, 
-        }).then((status) => {
-            post[0].setStatus(status);
+        }).then(async (status) => {
+            await post[0].setStatus(status);
         }).catch((err) => {
             console.log(err);
             throw err;
         });
         await User.findOne({
             where: {username: 'admin'}, 
-        }).then((user) => {
-            post[0].setUser(user);
+        }).then(async (user) => {
+            await post[0].setUser(user);
         }).catch((err) => {
             console.log(err);
             throw err;
@@ -220,16 +220,16 @@ export const seedDatabase = async () => {
     }).then(async (post) => {
         await Status.findOne({
             where: {name: 'published'}, 
-        }).then((status) => {
-            post[0].setStatus(status);
+        }).then(async (status) => {
+            await post[0].setStatus(status);
         }).catch((err) => {
             console.log(err);
             throw err;
         });
         await User.findOne({
             where: {username: 'admin'}, 
-        }).then((user) => {
-            post[0].setUser(user);
+        }).then(async (user) => {
+            await post[0].setUser(user);
         }).catch((err) => {
             console.log(err);
             throw err;
@@ -249,16 +249,16 @@ export const seedDatabase = async () => {
     }).then(async (comment) => {
         await Post.findOne({
             where: {title: 'Seeded post1'}, 
-        }).then((post) => {
-            comment[0].setPost(post);
+        }).then(async (post) => {
+            await comment[0].setPost(post);
         }).catch((err) => {
             console.log(err);
             throw err;
         });
         await User.findOne({
             where: {username: 'username'}, 
-        }).then((user) => {
-            comment[0].setUser(user);
+        }).then(async (user) => {
+            await comment[0].setUser(user);
         }).catch((err) => {
             console.log(err);
             throw err;
@@ -277,16 +277,16 @@ export const seedDatabase = async () => {
     }).then(async (comment) => {
         await Post.findOne({
             where: {title: 'Seeded post1'}, 
-        }).then((post) => {
-            comment[0].setPost(post);
+        }).then(async (post) => {
+            await comment[0].setPost(post);
         }).catch((err) => {
             console.log(err);
             throw err;
         });
         await User.findOne({
             where: {username: 'admin'}, 
-        }).then((user) => {
-            comment[0].setUser(user);
+        }).then(async (user) => {
+            await comment[0].setUser(user);
         }).catch((err) => {
             console.log(err);
             throw err;
