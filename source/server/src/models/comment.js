@@ -10,11 +10,10 @@ Comment.init({
         primaryKey: true,
         allowNull: false
     },
-    name: {
+    content: {
         type: DataTypes.STRING,
-        allowNull: false,
-        unique: true
-    }
+        allowNull: false
+    },
     
 }, {
     sequelize,

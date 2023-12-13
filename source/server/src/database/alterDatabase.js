@@ -20,9 +20,15 @@ export const createRelations = async () => {
     // User to Post relationship
     User.hasMany(Post, { foreignKey: 'userId' });
     Post.belongsTo(User, { foreignKey: 'userId' });
+
+    // User to Comment relationship
+    User.hasMany(Comment, { foreignKey: 'userId' });
+    Comment.belongsTo(User, { foreignKey: 'userId' });
 };
 
 export const seedDatabase = async () => {
+
+    // Create roles
     await Role.findOrCreate({
         where: {name: 'admin'}, 
     }).then(() => {
@@ -32,7 +38,7 @@ export const seedDatabase = async () => {
         throw err;
     });
 
-    await Role.findCreateFind({
+    await Role.findOrCreate({
         where: {name: 'user'}, 
     }).then(() =>{
         console.log('User role created');
@@ -41,6 +47,35 @@ export const seedDatabase = async () => {
         throw err;
     });
 
+    // Create statuses
+    await Status.findOrCreate({
+        where: {name: 'hidden'},
+    }).then(() => {
+        console.log('Status hidden created');
+    }).catch((err) => {
+        console.log(err);
+        throw err;
+    });
+
+    await Status.findOrCreate({
+        where: {name: 'published'},
+    }).then(() => {
+        console.log('Status published created');
+    }).catch((err) => {
+        console.log(err);
+        throw err;
+    });
+
+    await Status.findOrCreate({
+        where: {name: 'deleted'},
+    }).then(() => {
+        console.log('Status deleted created');
+    }).catch((err) => {
+        console.log(err);
+        throw err;
+    });
+
+    // Create example users
     await User.findOrCreate({
         where: {
             username: 'username',
@@ -49,8 +84,8 @@ export const seedDatabase = async () => {
             password: "$2a$10$/cE7hkbotQ50UYrK22ijuubmnWHxzVf9VN1Po8WPQp.Uk3riOyHh.",
             phoneNumber: process.env.PHONE_NUMBER,
         },
-    }).then((user) => {
-        Role.findOne({
+    }).then(async (user) => {
+        await Role.findOne({
             where: {name: 'user'}, 
         }).then((role) => {
             user[0].setRole(role);
@@ -58,8 +93,209 @@ export const seedDatabase = async () => {
             console.log(err);
             throw err;
         });
+    }).then(() => {
+        console.log('User username created');
     }).catch((err) => {
         console.log(err);
         throw err;
     });
+
+    await User.findOrCreate({
+        where: {
+            username: 'admin',
+            email: 'admin@email.com',
+            // Password: #S3$UZe2K2*xjG
+            password: "$2a$10$/cE7hkbotQ50UYrK22ijuubmnWHxzVf9VN1Po8WPQp.Uk3riOyHh.",
+            phoneNumber: process.env.PHONE_NUMBER,
+        },
+    }).then(async (user) => {
+        await Role.findOne({
+            where: {name: 'admin'}, 
+        }).then((role) => {
+            user[0].setRole(role);
+        }).catch((err) => {
+            console.log(err);
+            throw err;
+        });
+    }).then(() => {
+        console.log('User admin created');
+    }).catch((err) => {
+        console.log(err);
+        throw err;
+    });
+
+    // Create example posts
+    await Post.findOrCreate({
+        where: {
+            title: 'Seeded post1',
+            content: 'Seeded post1 content',
+        }
+    }).then(async (post) => {
+        await Status.findOne({
+            where: {name: 'published'}, 
+        }).then((status) => {
+            post[0].setStatus(status);
+        }).catch((err) => {
+            console.log(err);
+            throw err;
+        });
+        await User.findOne({
+            where: {username: 'username'}, 
+        }).then((user) => {
+            post[0].setUser(user);
+        }).catch((err) => {
+            console.log(err);
+            throw err;
+        });
+    }).then(() => {
+        console.log('Post Seeded post1 created');
+    }).catch((err) => {
+        console.log(err);
+        throw err;
+    });
+
+    await Post.findOrCreate({
+        where: {
+            title: 'Seeded post2',
+            content: 'Seeded post2 content',
+        }
+    }).then(async (post) => {
+        await Status.findOne({
+            where: {name: 'deleted'}, 
+        }).then((status) => {
+            post[0].setStatus(status);
+        }).catch((err) => {
+            console.log(err);
+            throw err;
+        });
+        await User.findOne({
+            where: {username: 'username'}, 
+        }).then((user) => {
+            post[0].setUser(user);
+        }).catch((err) => {
+            console.log(err);
+            throw err;
+        });
+    }).then(() => {
+        console.log('Post Seeded post2 created');
+    }).catch((err) => {
+        console.log(err);
+        throw err;
+    });
+
+    await Post.findOrCreate({
+        where: {
+            title: 'Seeded post3',
+            content: 'Seeded post3 content',
+        }
+    }).then(async (post) => {
+        await Status.findOne({
+            where: {name: 'hidden'}, 
+        }).then((status) => {
+            post[0].setStatus(status);
+        }).catch((err) => {
+            console.log(err);
+            throw err;
+        });
+        await User.findOne({
+            where: {username: 'admin'}, 
+        }).then((user) => {
+            post[0].setUser(user);
+        }).catch((err) => {
+            console.log(err);
+            throw err;
+        });
+    }).then(() => {
+        console.log('Post Seeded post3 created');
+    }).catch((err) => {
+        console.log(err);
+        throw err;
+    });
+
+    await Post.findOrCreate({
+        where: {
+            title: 'Seeded post4',
+            content: 'Seeded post4 content',
+        }
+    }).then(async (post) => {
+        await Status.findOne({
+            where: {name: 'published'}, 
+        }).then((status) => {
+            post[0].setStatus(status);
+        }).catch((err) => {
+            console.log(err);
+            throw err;
+        });
+        await User.findOne({
+            where: {username: 'admin'}, 
+        }).then((user) => {
+            post[0].setUser(user);
+        }).catch((err) => {
+            console.log(err);
+            throw err;
+        });
+    }).then(() => {
+        console.log('Post Seeded post4 created');
+    }).catch((err) => {
+        console.log(err);
+        throw err;
+    });
+
+    // Create example comments (only on seeded post1)
+    await Comment.findOrCreate({
+        where: {
+            content: 'Seeded comment1',
+        }
+    }).then(async (comment) => {
+        await Post.findOne({
+            where: {title: 'Seeded post1'}, 
+        }).then((post) => {
+            comment[0].setPost(post);
+        }).catch((err) => {
+            console.log(err);
+            throw err;
+        });
+        await User.findOne({
+            where: {username: 'username'}, 
+        }).then((user) => {
+            comment[0].setUser(user);
+        }).catch((err) => {
+            console.log(err);
+            throw err;
+        });
+    }).then(() => {
+        console.log('Comment Seeded comment1 created');
+    }).catch((err) => {  
+        console.log(err);
+        throw err;
+    });
+
+    await Comment.findOrCreate({
+        where: {
+            content: 'Seeded comment2',
+        }
+    }).then(async (comment) => {
+        await Post.findOne({
+            where: {title: 'Seeded post1'}, 
+        }).then((post) => {
+            comment[0].setPost(post);
+        }).catch((err) => {
+            console.log(err);
+            throw err;
+        });
+        await User.findOne({
+            where: {username: 'admin'}, 
+        }).then((user) => {
+            comment[0].setUser(user);
+        }).catch((err) => {
+            console.log(err);
+            throw err;
+        });
+    }).then(() => {
+        console.log('Comment Seeded comment2 created');
+    }).catch((err) => {  
+        console.log(err);
+        throw err;
+    });
+        
 };
