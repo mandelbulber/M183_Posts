@@ -15,7 +15,7 @@ export const Register: FC = () => {
       ),
     }).then((response) => {
       if (response.status === 201) {
-        window.location.href = "/";
+        window.location.href = "/profile";
       } else {
         document.getElementById("server_message")!.innerHTML = response.statusText;
       }
@@ -35,14 +35,14 @@ export const Register: FC = () => {
       document.getElementById("submit")!.setAttribute("disabled", "true");
     }
   }
-  
-  const checkPassword= (password: string) => {
+
+  const checkPassword = (password: string) => {
     // check if password meets requirements
-    let lengthMet = password.length >= 12;
-    let uppercaseMet = /[A-Z]/.test(password);
-    let lowercaseMet = /[a-z]/.test(password);
-    let numberMet = /[0-9]/.test(password);
-    let specialMet = /[^A-Za-z0-9]/.test(password);
+    const lengthMet = password.length >= 12;
+    const uppercaseMet = /[A-Z]/.test(password);
+    const lowercaseMet = /[a-z]/.test(password);
+    const numberMet = /[0-9]/.test(password);
+    const specialMet = /[^A-Za-z0-9]/.test(password);
 
     // hide met requirements
     if (lengthMet)
@@ -89,7 +89,7 @@ export const Register: FC = () => {
       transform: translate(-50%, -50%);
     `}>
       <h1>Register</h1>
-      
+
       <div id="server_message" className={css`
         color: red;
         font-weight: bold;
@@ -112,9 +112,9 @@ export const Register: FC = () => {
         <input id="email" type="email" onChange={checkInput} name="email" placeholder="Email" />
         <input id="password" type="password" onChange={checkInput} name="password" placeholder="Password" />
         <input id="phoneNumber" type="tel" onChange={checkInput} name="phoneNumber" placeholder="Phone Number" />
-        <input id="submit" type="submit" value="Register" disabled/>
+        <input id="submit" type="submit" value="Register" disabled />
       </form>
-      
+
       <a href="/login" className={css`
         margin-top: 1rem;
         margin-bottom: 2rem;

@@ -48,6 +48,10 @@ authRouter.post('/register', async (req, res) => {
     }
 
     createUser(username, email, password, phoneNumber).then(() => {
+        // generate jwt-token
+        const token = jwt.sign({ username: username }, process.env.JWT_SECRET, { expiresIn: '1h' });
+        res.cookie('jwt', token, { httpOnly: true, secure: true });
+
         res.status(201).end(); // 201 created
     }).catch((err) => {
         console.log(err);
@@ -107,8 +111,8 @@ authRouter.post('/verify', async (req, res) => {
 
     // generate jwt
     const token = jwt.sign({ username: username }, process.env.JWT_SECRET, { expiresIn: '1h' });
-
     res.cookie('jwt', token, { httpOnly: true, secure: true });
+
     res.status(200).end(); // 200 ok
 });
 
