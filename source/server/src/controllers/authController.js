@@ -109,7 +109,7 @@ export const createUser = async (username, email, password, phoneNumber) => {
         },
     }).then(async (user) => {
         await Role.findOne({
-            where: {name: 'user'}, 
+            where: { name: 'user' },
         }).then(async (role) => {
             await user[0].setRole(role);
         }).catch((err) => {
@@ -186,11 +186,22 @@ export const sendSmsToken = async (username, smsToken) => {
 export const cookieJwtAuth = async (req, res) => {
     console.log('Checking if user is authenticated');
 
-    if (req.cookies.jwt) {
-        req.userData = jwt.verify(req.cookies.jwt, process.env.JWT_SECRET);
-        return true;
+    try {
+        const jwtCookie = req.cookies.jwt;
+        if (jwtCookie) {
+            const decoded = jwt.verify(jwtCookie, process.env.JWT_SECRET);
+            console.log('User is authenticated: ' + JSON.stringify(decoded));
+            req.userData = decoded;
+            return true;
+        }
+        else {
+            console.log('User is not authenticated');
+            res.clearCookie('jwt');
+            return false;
+        }
     }
-    else {
+    catch (err) {
+        console.log('jwt token invalid / expired')
         res.clearCookie('jwt');
         return false;
     }
