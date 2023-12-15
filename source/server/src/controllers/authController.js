@@ -107,11 +107,11 @@ export const createUser = async (username, email, password, phoneNumber) => {
             password: hashedPassword,
             phoneNumber: phoneNumber,
         },
-    }).then((user) => {
-        Role.findOne({
+    }).then(async (user) => {
+        await Role.findOne({
             where: {name: 'user'}, 
-        }).then((role) => {
-            user[0].setRole(role);
+        }).then(async (role) => {
+            await user[0].setRole(role);
         }).catch((err) => {
             console.log(err);
             throw err;
