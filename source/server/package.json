@@ -18,7 +18,8 @@
     "jsonwebtoken": "^9.0.2",
     "sequelize": "^6.35.1",
     "sqlite3": "^5.1.6",
-    "validator": "^13.11.0"
+    "validator": "^13.11.0",
+    "winston": "^3.11.0"
   },
   "devDependencies": {
     "nodemon": "^3.0.2"

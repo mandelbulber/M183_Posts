@@ -2,37 +2,44 @@ import { User } from '../models/user.js';
 import { Role } from '../models/role.js';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import { logger } from '../logger/logger.js';
 
 export const checkEmailUsed = async (email) => {
-    console.log('Check if email is already used');
+    logger.debug(`AuthController: Check if email '${email}' is already used`);
     const emailUsed = await User.findOne({
         where: {
             email: email,
         }
     });
 
-    if (emailUsed)
+    if (emailUsed) {
+        logger.debug(`Email '${email}' is already used`);
         return true;
-    else
+    } else {
+        logger.debug(`Email '${email}' is not used`);
         return false;
+    }
 }
 
 export const checkUsernameUsed = async (username) => {
-    console.log('Check if username is already used');
+    logger.debug(`AuthController: Check if username '${username}' is already used`);
     const usernameUsed = await User.findOne({
         where: {
             username: username,
         }
     });
 
-    if (usernameUsed)
+    if (usernameUsed) {
+        logger.debug(`Username '${username}' is already used`);
         return true;
-    else
+    } else {
+        logger.debug(`Username '${username}' is not used`);
         return false;
+    }
 }
 
 export const checkPasswordCorrect = async (username, password) => {
-    console.log('Checking if password is correct asjdjasdjdjdjdjdjd');
+    logger.debug(`AuthController: Check if password is correct for user '${username}'`);
 
     // get hashed password from database
     const hashedPassword = await User.findOne({
@@ -46,21 +53,24 @@ export const checkPasswordCorrect = async (username, password) => {
         else
             return null;
     }).catch((err) => {
-        console.log(err);
+        logger.error(`AuthController: Error while getting password for user '${username}'`);
         throw err;
     });
 
     // compare passwords
     if (hashedPassword) {
-        if (await bcrypt.compare(password, hashedPassword))
+        if (await bcrypt.compare(password, hashedPassword)) {
+            logger.debug(`AuthController: Password is correct for user '${username}'`);
             return true;
-        else
+        } else {
+            logger.debug(`AuthController: Password is not correct for user '${username}'`);
             return false;
+        }
     }
 }
 
 export const checkSmsTokenCorrect = async (username, smsToken) => {
-    console.log('Checking if sms token is correct');
+    logger.debug(`AuthController: Check if SMS code is correct for user '${username}'`);
 
     if (await User.findOne({
         where: {
@@ -72,6 +82,8 @@ export const checkSmsTokenCorrect = async (username, smsToken) => {
             username: username,
         }
     })).smsTokenCreatedAt) < 300000) {
+        logger.debug(`AuthController: SMS code is correct for user '${username}'`);
+
         // delete sms token
         await User.update({
             smsToken: null,
@@ -81,24 +93,24 @@ export const checkSmsTokenCorrect = async (username, smsToken) => {
                 username: username
             }
         }).then(() => {
-            console.log('Sms token deleted');
+            logger.debug(`AuthController: SMS code deleted for user '${username}'`);
         }).catch((err) => {
-            console.log(err);
+            logger.error(`AuthController: Error while deleting SMS code for user '${username}'`);
             throw err;
         });
         return true;
     }
     else {
+        logger.debug(`AuthController: SMS code is not correct for user '${username}'`);
         // ToDo: +1 failed login attempt
         return false;
     }
 }
 
 export const createUser = async (username, email, password, phoneNumber) => {
-    console.log('Registering a user');
+    logger.debug(`AuthController: Create user with properties {username: '${username}', email: '${email}', phoneNumber: '${phoneNumber}'}`);
 
     // create user
-    console.log('hashing password');
     const hashedPassword = await bcrypt.hash(password, 10);
     await User.findOrCreate({
         where: {
@@ -113,19 +125,18 @@ export const createUser = async (username, email, password, phoneNumber) => {
         }).then(async (role) => {
             await user[0].setRole(role);
         }).catch((err) => {
-            console.log(err);
             throw err;
         });
     }).then(() => {
-        console.log('User created');
+        logger.debug(`AuthController: User with properties {username: '${username}', email: '${email}', phoneNumber: '${phoneNumber}'} created`);
     }).catch((err) => {
-        console.log(err);
+        logger.error(`AuthController: Error while creating user with properties {username: '${username}', email: '${email}', phoneNumber: '${phoneNumber}'}: ${err}}`);
         throw err;
     });
 }
 
 export const getUserDetails = async (username) => {
-    console.log('Getting user details for user: ' + username);
+    logger.debug(`AuthController: Get user details for user '${username}'`);
 
     const user = await User.findOne({
         where: {
@@ -133,16 +144,18 @@ export const getUserDetails = async (username) => {
         },
         attributes: ['username', 'email', 'phoneNumber']
     }).then((user) => {
+        logger.debug(`AuthController: User details for user '${username}' found and provided`);
         return user.dataValues;
     }).catch((err) => {
-        console.log(err);
+        logger.error(`AuthController: Error while getting user details for user '${username}': ${err}`);
         throw err;
     });
     return user;
 }
 
 export const saveSmsToken = async (username, smsToken) => {
-    console.log('Saving sms token');
+    logger.debug(`AuthController: Save SMS code ${smsToken} for user '${username}'`);
+
     await User.update({
         smsToken: smsToken,
         smsTokenCreatedAt: new Date()
@@ -151,15 +164,15 @@ export const saveSmsToken = async (username, smsToken) => {
             username: username
         }
     }).then(() => {
-        console.log('Sms token saved');
+        logger.debug(`AuthController: SMS code ${smsToken} saved for user '${username}'`);
     }).catch((err) => {
-        console.log(err);
+        logger.error(`AuthController: Error while saving SMS code ${smsToken} for user '${username}': ${err}`);
         throw err;
     });
 }
 
 export const sendSmsToken = async (username, smsToken) => {
-    console.log('Sending sms token');
+    logger.debug(`AuthController: Send SMS code ${smsToken} to user '${username}'`);
 
     // get phone number for username
     const user = await User.findOne({
@@ -180,28 +193,33 @@ export const sendSmsToken = async (username, smsToken) => {
             'X-Api-Key': process.env.GIBZ_API_KEY,
         },
         body: JSON.stringify(payload),
+    }).then(() => {
+        logger.debug(`AuthController: SMS code ${smsToken} sent to user '${username}'`);
+    }).catch((err) => {
+        logger.error(`AuthController: Error while sending SMS code ${smsToken} to user '${username}': ${err}`);
+        throw err;
     });
 }
 
 export const cookieJwtAuth = async (req, res) => {
-    console.log('Checking if user is authenticated');
+    logger.debug(`AuthController: Check if user is authenticated`);
 
     try {
         const jwtCookie = req.cookies.jwt;
         if (jwtCookie) {
             const decoded = jwt.verify(jwtCookie, process.env.JWT_SECRET);
-            console.log('User is authenticated: ' + JSON.stringify(decoded));
+            logger.debug(`AuthController: User '${decoded.username}' is authenticated`);
             req.userData = decoded;
             return true;
         }
         else {
-            console.log('User is not authenticated');
+            logger.debug(`AuthController: User is not authenticated`);
             res.clearCookie('jwt');
             return false;
         }
     }
     catch (err) {
-        console.log('jwt token invalid / expired')
+        logger.debug(`AuthController: Users jwt token is invalid / expired`);
         res.clearCookie('jwt');
         return false;
     }

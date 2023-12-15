@@ -4,6 +4,7 @@ import { postsRouter } from './routes/post.js';
 import { sequelize } from './database/database.js';
 import cookieParser from 'cookie-parser';
 import { createRelations, seedDatabase } from './database/alterDatabase.js';
+import { logger } from './logger/logger.js';
 
 import dotenv from 'dotenv';
 dotenv.config();
@@ -22,10 +23,10 @@ app.use('/api/post', postsRouter);
 // database connection
 createRelations();
 await sequelize.sync().then(() => {
-    console.log('Database synced');
+    logger.info('Database synced');
 });
 seedDatabase();
 
 app.listen(port, () => {
-    console.log(`Server listening at http://localhost:${port}`);
+    logger.info(`Server listening at http://localhost:${port}`);
 });
