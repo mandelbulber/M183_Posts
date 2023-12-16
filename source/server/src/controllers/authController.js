@@ -153,6 +153,106 @@ export const getUserDetails = async (username) => {
     return user;
 }
 
+export const incrementFailedLoginAttempts = async (username) => {
+    logger.debug(`AuthController: Increment failed login attempts for user '${username}'`);
+
+    const failedLoginAttempts = await User.findOne({
+        where: {
+            username: username
+        },
+        attributes: ['failedLoginAttempts']
+    }).then((user) => {
+        if (user)
+            return user.dataValues.failedLoginAttempts;
+        else
+            return null;
+    }).catch((err) => {
+        logger.error(`AuthController: Error while getting failed login attempts for user '${username}': ${err}`);
+        throw err;
+    });
+
+    if (failedLoginAttempts >= 2) {
+        await User.update({
+            failedLoginAttempts: 0,
+            blockedUntil: new Date(new Date().getTime() + 300000)
+        }, {
+            where: {
+                username: username
+            }
+        }).then(() => {
+            logger.debug(`AuthController: User '${username}' blocked`);
+        }
+        ).catch((err) => {
+            logger.error(`AuthController: Error while blocking user '${username}': ${err}`);
+            throw err;
+        });
+    } else {
+        await User.update({
+            failedLoginAttempts: failedLoginAttempts + 1
+        }, {
+            where: {
+                username: username
+            }
+        }).then(() => {
+            logger.debug(`AuthController: Failed login attempts for user '${username}' incremented`);
+        }
+        ).catch((err) => {
+            logger.error(`AuthController: Error while incrementing failed login attempts for user '${username}': ${err}`);
+            throw err;
+        });
+    }
+}
+
+export const resetFailedLoginAttempts = async (username) => {
+    logger.debug(`AuthController: Reset failed login attempts for user '${username}'`);
+
+    await User.update({
+        failedLoginAttempts: 0
+    }, {
+        where: {
+            username: username
+        }
+    }).then(() => {
+        logger.debug(`AuthController: Failed login attempts for user '${username}' resetted`);
+    }
+    ).catch((err) => {
+        logger.error(`AuthController: Error while resetting failed login attempts for user '${username}': ${err}`);
+        throw err;
+    });
+}
+
+export const checkUserBlocked = async (username) => {
+    logger.debug(`AuthController: Check if user '${username}' is blocked`);
+
+    const blockedUntil = await User.findOne({
+        where: {
+            username: username
+        },
+        attributes: ['blockedUntil']
+    }).then((user) => {
+        if (user)
+            return user.dataValues.blockedUntil;
+        else
+            return null;
+    }).catch((err) => {
+        logger.error(`AuthController: Error while getting blockedUntil for user '${username}': ${err}`);
+        throw err;
+    });
+
+    if (blockedUntil) {
+        if (blockedUntil > new Date()) {
+            logger.debug(`AuthController: User '${username}' is blocked`);
+            return true;
+        } else {
+            logger.debug(`AuthController: User '${username}' is not blocked`);
+            return false;
+        }
+    }
+
+    logger.debug(`AuthController: User '${username}' is not blocked`);
+    return false;
+}
+
 export const saveSmsToken = async (username, smsToken) => {
     logger.debug(`AuthController: Save SMS code ${smsToken} for user '${username}'`);
 

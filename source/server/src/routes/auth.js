@@ -1,5 +1,5 @@
 import express from 'express';
-import { checkEmailUsed, checkPasswordCorrect, checkSmsTokenCorrect, checkUsernameUsed, cookieJwtAuth, createUser, getUserDetails, saveSmsToken, sendSmsToken } from '../controllers/authController.js';
+import { checkEmailUsed, checkPasswordCorrect, checkSmsTokenCorrect, checkUsernameUsed, cookieJwtAuth, createUser, getUserDetails, saveSmsToken, sendSmsToken, checkUserBlocked, incrementFailedLoginAttempts, resetFailedLoginAttempts } from '../controllers/authController.js';
 import validator from 'validator';
 import jwt from 'jsonwebtoken';
 import { logger } from '../logger/logger.js';
@@ -80,11 +80,33 @@ authRouter.post('/login', async (req, res) => {
         return res.status(400).end(); // 400 bad request
     }
 
-    // check if username exists and matches with password [req. 2.4]
     const userExists = await checkUsernameUsed(username);
     const passwordCorrect = await checkPasswordCorrect(username, password);
+
+    // check if user is blocked
+    if (userExists) {
+        const userBlocked = await checkUserBlocked(username);
+        if (userBlocked) {
+            logger.debug(`Login: User '${username}' is blocked`);
+            res.statusMessage = 'User is blocked for 5 minutes, try again later';
+            return res.status(401).end(); // 401 unauthorized
+        }
+    }
+
+    // check if username exists and matches with password [req. 2.4]
     if (!userExists || !passwordCorrect) {
         logger.debug(`Login: Username or password entered incorrect for user '${username}'`);
+
+        // increment failed login attempts
+        if (userExists) {
+            logger.debug(`Login: Incrementing failed login attempts for user '${username}'`);
+            await incrementFailedLoginAttempts(username).then(() => {
+                logger.debug(`Login: Failed login attempts incremented for user '${username}'`);
+            }).catch((err) => {
+                logger.error(`Login: Failed login attempts incrementing failed for user '${username}'` + err);
+            });
+        }
+
         res.statusMessage = 'Username or password incorrect';
         return res.status(401).end(); // 401 unauthorized
     }
@@ -119,12 +141,43 @@ authRouter.post('/verify', async (req, res) => {
         return res.status(400).end(); // 400 bad request
     }
 
+    // check if user is blocked
+    const userExists = await checkUsernameUsed(username);
+    if (userExists) {
+        const userBlocked = await checkUserBlocked(username);
+        if (userBlocked) {
+            logger.debug(`Verify: User '${username}' is blocked`);
+            res.statusMessage = 'User is blocked for 5 minutes, try again later';
+            return res.status(401).end(); // 401 unauthorized
+        }
+    } else {
+        logger.debug(`Verify: Username '${username}' does not exist`);
+        res.statusMessage = 'Login failed unexpectedly';
+        return res.status(401).end(); // 401 unauthorized
+    }
+
     // check if username and sms-token match [req. 2.9]
     if (!await checkSmsTokenCorrect(username, smsToken)) {
         logger.debug(`Verify: SMS-Code '${smsToken}' doesn't match user '${username}'`);
         res.statusMessage = 'SMS-Code doesn\'t match user';
+
+        // increment failed login attempts
+        logger.debug(`Verify: Incrementing failed login attempts for user '${username}'`);
+        await incrementFailedLoginAttempts(username).then(() => {
+            logger.debug(`Verify: Failed login attempts incremented for user '${username}'`);
+        }).catch((err) => {
+            logger.error(`Verify: Failed login attempts incrementing failed for user '${username}'` + err);
+        });
+        
         return res.status(401).end(); // 401 unauthorized
     }
+
+    // reset failed login attempts
+    await resetFailedLoginAttempts(username).then(() => {
+        logger.debug(`Verify: Failed login attempts resetted for user '${username}'`);
+    }).catch((err) => {
+        logger.error(`Verify: Failed login attempts resetting failed for user '${username}'` + err);
+    });
 
     // generate jwt
     const token = jwt.sign({ username: username }, process.env.JWT_SECRET, { expiresIn: '1h' });

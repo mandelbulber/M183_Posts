@@ -36,6 +36,15 @@ User.init({
         type: DataTypes.DATE,
         allowNull: true
     },
+    failedLoginAttempts: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 0
+    },
+    blockedUntil: {
+        type: DataTypes.DATE,
+        allowNull: true
+    },
 }, {
     sequelize,
     modelName: 'user'
