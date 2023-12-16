@@ -42,12 +42,12 @@ export const TwoFactor: FC = () => {
         flex-direction: column;
         align-items: center;
         justify-content: center;
-
-        input {
-          margin-top: 1rem;
-          padding: 0.5rem;
-          border: none;
-          border-radius: 0.5rem;
+        
+        & > * {
+          margin-bottom: 20px;
+        }
+        & > *:last-child {
+          margin-bottom: 0;
         }
       `}>
         <div id="server_message" className={css`

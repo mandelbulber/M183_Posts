@@ -48,10 +48,10 @@ export const Login: FC = () => {
         justify-content: center;
 
         input {
-          margin-top: 1rem;
-          padding: 0.5rem;
-          border: none;
-          border-radius: 0.5rem;
+          margin-bottom: 20px;
+        }
+        input:last-child {
+          margin-bottom: 0;
         }
       `}>
         <input type="text" name="username" placeholder="Username" />

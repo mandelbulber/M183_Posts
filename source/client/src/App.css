@@ -12,3 +12,19 @@ body {
     color: #fff;
     margin: 0;
 }
+
+input,
+textarea {
+    padding: 10px;
+    border: 1px solid white;
+    border-radius: 10px;
+    background-color: inherit;
+    color: inherit;
+}
+input:focus-visible,
+textarea:focus-visible {
+    outline: none;
+}
+input[type="submit"]:hover {
+    cursor: pointer;
+}
