@@ -1,6 +1,7 @@
 import express from 'express';
 import { authRouter } from './routes/auth.js';
-import { postsRouter } from './routes/post.js';
+import { postRouter } from './routes/post.js';
+import { postSecuredRouter } from './routes/postSecured.js';
 import { sequelize } from './database/database.js';
 import cookieParser from 'cookie-parser';
 import { createRelations, seedDatabase } from './database/alterDatabase.js';
@@ -18,7 +19,8 @@ app.use(cookieParser());
 
 // define routes
 app.use('/api/auth', authRouter);
-app.use('/api/post', postsRouter);
+app.use('/api/post', postRouter);
+app.use('/api/posts', postSecuredRouter)
 
 // database connection
 createRelations();

@@ -1,20 +1,20 @@
 import express from 'express';
 import { createPost, getAllPublishedPosts, getPostById, changePostStatus, addComment } from '../controllers/postController.js';
-export const postsRouter = express.Router();
+export const postRouter = express.Router();
 
 // TODO: Add authentication where needed
 
-postsRouter.get('/', async (req, res) => {
+postRouter.get('/', async (req, res) => {
     const posts = await getAllPublishedPosts();
     res.send(posts);
 });
 
-postsRouter.get('/:id', async (req, res) => {
+postRouter.get('/:id', async (req, res) => {
     const post = await getPostById(req.params.id);
     res.send(post);
 });
 
-postsRouter.post('/create', async (req, res) => {
+postRouter.post('/create', async (req, res) => {
     const { title, content, username } = req.body;
 
     // check if all parameters are provided
@@ -28,7 +28,7 @@ postsRouter.post('/create', async (req, res) => {
     });
 });
 
-postsRouter.post('/update', async (req, res) => {
+postRouter.post('/update', async (req, res) => {
     const { postId, status } = req.body;
 
     // check if all parameters are provided
@@ -42,7 +42,7 @@ postsRouter.post('/update', async (req, res) => {
     });
 });
 
-postsRouter.post('/comment', async (req, res) => {
+postRouter.post('/comment', async (req, res) => {
     const { postId, content, username } = req.body;
 
     // check if all parameters are provided
