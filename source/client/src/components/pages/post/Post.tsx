@@ -35,6 +35,13 @@ export const Post: FC = () => {
       <p>Author: {post.userId}</p>
       <hr />
       <p>{post.content}</p>
+      <ul>
+        {post.comments?.map((comment: any) =>
+          <li key={comment.id} className={css`
+            margin-bottom: 10px;
+          `}>{comment.userId}:<br />{comment.content}</li>
+        )}
+      </ul>
 
     </div>
   );
