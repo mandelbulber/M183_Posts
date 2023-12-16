@@ -4,6 +4,7 @@ import { TwoFactor } from './components/pages/twofactor/TwoFactor'
 import { Register } from './components/pages/register/Register'
 import { Profile } from './components/pages/profile/Profile'
 import { Login } from './components/pages/login/Login'
+import { Home } from './components/pages/home/Home'
 import { FC } from 'react'
 import './App.css'
 
@@ -12,6 +13,7 @@ export const App: FC = () => {
     <>
       <Navigation />
       <Routes>
+        <Route path="/" element={<Home />} />
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
         <Route path="/verify" element={<TwoFactor />} />
