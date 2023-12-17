@@ -89,6 +89,9 @@ export const Post: FC = () => {
         & > * {
           margin-bottom: 20px;
         }
+        & > *:last-child {
+          margin-bottom: 0;
+        }
         `}>
           <textarea name="content" placeholder="Comment" cols={50} rows={5}></textarea>
           <input type="submit" value="Comment" />
