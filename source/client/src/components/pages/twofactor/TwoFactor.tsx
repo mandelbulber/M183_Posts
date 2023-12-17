@@ -15,6 +15,7 @@ export const TwoFactor: FC = () => {
       }),
     }).then((response) => {
       if (response.status === 200) {
+        localStorage.removeItem("username");
         window.location.href = "/profile";
       } else if (response.status === 403) {
         window.location.href = "/login";
