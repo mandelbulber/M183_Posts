@@ -102,10 +102,34 @@ export const checkSmsTokenCorrect = async (username, smsToken) => {
     }
     else {
         logger.debug(`AuthController: SMS code is not correct for user '${username}'`);
-        // ToDo: +1 failed login attempt
         return false;
     }
 }
+
+export const checkSmsTokenAvailable = async (username) => {
+    logger.debug(`AuthController: Check if SMS code is available for user '${username}'`);
+
+    const smsToken = await User.findOne({
+        where: {
+            username: username
+        },
+        attributes: ['smsToken']
+    }).then((user) => {
+        return user.dataValues.smsToken;
+    }).catch((err) => {
+        logger.error(`AuthController: Error while getting SMS code for user '${username}'`);
+        throw err;
+    });
+
+    if (smsToken) {
+        logger.debug(`AuthController: SMS code is available for user '${username}'`);
+        return true;
+    } else {
+        logger.debug(`AuthController: No SMS code is available for user '${username}'`);
+        return false;
+    }
+}
+
 
 export const createUser = async (username, email, password, phoneNumber) => {
     logger.debug(`AuthController: Create user with properties {username: '${username}', email: '${email}', phoneNumber: '${phoneNumber}'}`);

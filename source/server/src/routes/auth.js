@@ -1,5 +1,5 @@
 import express from 'express';
-import { checkEmailUsed, checkPasswordCorrect, checkSmsTokenCorrect, checkUsernameUsed, cookieJwtAuth, createUser, getUserDetails, saveSmsToken, sendSmsToken, checkUserBlocked, incrementFailedLoginAttempts, resetFailedLoginAttempts } from '../controllers/authController.js';
+import { checkEmailUsed, checkPasswordCorrect, checkSmsTokenCorrect, checkUsernameUsed, cookieJwtAuth, createUser, getUserDetails, saveSmsToken, sendSmsToken, checkUserBlocked, incrementFailedLoginAttempts, resetFailedLoginAttempts, checkSmsTokenAvailable } from '../controllers/authController.js';
 import validator from 'validator';
 import jwt from 'jsonwebtoken';
 import { logger } from '../logger/logger.js';
@@ -133,12 +133,25 @@ authRouter.post('/login', async (req, res) => {
 
 authRouter.post('/verify', async (req, res) => {
     const { username, smsToken } = req.body;
-
+    
     //check if all parameters are provided
     if (!username || !smsToken) {
         logger.debug(`Verify: Missing parameters { username: ${username}, smsToken: ${smsToken} }}`);
         res.statusMessage = 'Missing parameters';
         return res.status(400).end(); // 400 bad request
+    }
+
+    // check if user went through first part of login process
+    const smsTokenAvailable = await checkSmsTokenAvailable(username).then((result) => {
+        return result;
+    }).catch((err) => {
+        logger.error(`Verify: SMS-Code availability check failed for user '${username}'` + err);
+    });
+
+    if (!smsTokenAvailable) {
+        logger.debug(`Verify: User '${username}' did not go through first part of login process`);
+        res.statusMessage = 'User did not go through first part of login process';
+        return res.status(403).end(); // 403 forbidden
     }
 
     // check if user is blocked
