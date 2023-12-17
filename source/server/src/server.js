@@ -23,11 +23,17 @@ app.use('/api/post', postRouter);
 app.use('/api/posts', postSecuredRouter)
 
 // database connection
-createRelations();
+await createRelations().catch((err) => {
+    logger.error('Error while creating relations' + err);
+});
+
 await sequelize.sync().then(() => {
     logger.info('Database synced');
 });
-seedDatabase();
+
+await seedDatabase().catch((err) => {
+    logger.error('Error while seeding database' + err);
+});
 
 app.listen(port, () => {
     logger.info(`Server listening at http://localhost:${port}`);
