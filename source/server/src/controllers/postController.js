@@ -36,7 +36,7 @@ export const getAllPublishedPosts = async () => {
             attributes: ['name']
         },{
             model: User,
-            attributes: [['username', 'author']]
+            attributes: ['username']
         }],
         attributes: ['id', 'title', 'content']
     }).then((posts) => {
@@ -50,9 +50,24 @@ export const getAllPublishedPosts = async () => {
 export const getPostById = async (postId) => {
     const post = await Post.findOne({
         include: [
-            Status,
-            Comment
+            {
+                model: Status,
+                attributes: ['name']
+            },
+            {
+                model: Comment,
+                include: [{
+                    model: User,
+                    attributes: ['username']
+                }],
+                attributes: ['id', 'content']
+            },
+            {
+                model: User,
+                attributes: ['username']
+            }
         ],
+        attributes: ['id', 'title', 'content'],
         where: {
             id: postId
         }

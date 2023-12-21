@@ -53,7 +53,7 @@ export const Home: FC = () => {
                 }
               `}>
               <h2>{post.title}</h2>
-              <p>{post.userId}</p>
+              <p>{post.user?.username}</p>
             </div>
           )
         }

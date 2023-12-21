@@ -63,7 +63,7 @@ export const Post: FC = () => {
         text-align: center;
       `}>{post.title}</h1>
 
-      <p>Author: {post.userId}</p>
+      <p>Author: {post.user?.username}</p>
       <hr />
       <p className={css`
         margin: 100px 0;
@@ -75,7 +75,7 @@ export const Post: FC = () => {
           <li key={comment.id} className={css`
             margin-bottom: 10px;
             white-space: pre-wrap;
-          `}>{comment.userId}:<br />{comment.content}</li>
+          `}>{comment.user?.username}:<br />{comment.content}</li>
         )}
       </ul>
 
