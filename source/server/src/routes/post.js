@@ -1,5 +1,5 @@
 import express from 'express';
-import { createPost, getAllPublishedPosts, getPostById, changePostStatus, addComment } from '../controllers/postController.js';
+import { createPost, getAllPublishedPosts, getPublishedPostById, changePostStatus, addComment } from '../controllers/postController.js';
 import { cookieJwtAuth } from '../controllers/authController.js';
 import { logger } from '../logger/logger.js';
 import { User } from '../models/user.js';
@@ -21,11 +21,16 @@ postRouter.get('/', async (req, res) => {
 });
 
 postRouter.get('/:id', async (req, res) => {
-    const post = await getPostById(req.params.id).catch((err) => {
-        logger.error(`Post: Post with id ${req.params.id} not found` + err);
+    const post = await getPublishedPostById(req.params.id).catch((err) => {
+        logger.error(`Post: Public post with id ${req.params.id} not found` + err);
         res.statusMessage = 'Post not found';
         return res.status(404).end(); // 404 not found
     });
+    if (!post) {
+        logger.error(`Post: Public post with id ${req.params.id} not found`);
+        res.statusMessage = 'Post not found';
+        return res.status(404).end(); // 404 not found
+    }
     res.send(post);
 });
 

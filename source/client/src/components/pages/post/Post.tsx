@@ -38,6 +38,8 @@ export const Post: FC = () => {
         response.json().then((data) => {
           setPost(data);
         });
+      } else {
+        window.location.href = "/";
       }
     });
     fetch("/api/auth/isAuthenticated", {

@@ -47,11 +47,12 @@ export const getAllPublishedPosts = async () => {
     return posts;
 }
 
-export const getPostById = async (postId) => {
+export const getPublishedPostById = async (postId) => {
     const post = await Post.findOne({
         include: [
             {
                 model: Status,
+                where: {name: 'published'},
                 attributes: ['name']
             },
             {
