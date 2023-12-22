@@ -35,7 +35,7 @@ export const Navigation: FC = () => {
     <div className={css`
       background-color: #333;
       color: #fff;
-      box-shadow: 0px 0px 10px 0px rgba(255,255,255,0.75);
+      box-shadow: 0px 0px 14px 0px rgb(88 252 255 / 64%);
       padding-inline: 10rem;
 
       display: flex;

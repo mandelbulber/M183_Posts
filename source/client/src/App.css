@@ -25,6 +25,9 @@ input:focus-visible,
 textarea:focus-visible {
     outline: none;
 }
+input[type="submit"] {
+    border-color: aqua;
+}
 input[type="submit"]:hover {
     cursor: pointer;
 }
