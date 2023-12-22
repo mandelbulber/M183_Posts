@@ -1,6 +1,21 @@
 import { css } from "@emotion/css";
-import { FC } from "react";
+import { FC, useEffect } from "react";
 export const Login: FC = () => {
+  useEffect(() => {
+    fetch("/api/auth/isAuthenticated", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }).then((response) => {
+      response.json().then((data) => {
+        if (data) {
+          window.location.href = "/dashboard";
+        }
+      });
+    });
+  }, []);
+
   const submitForm = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const userInputs = Object.fromEntries(new FormData(event.currentTarget));

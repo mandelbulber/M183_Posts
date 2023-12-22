@@ -9,6 +9,13 @@ export const authRouter = express.Router();
 authRouter.post('/register', async (req, res) => {
     const { username, email, password, phoneNumber } = req.body;
 
+    // check if user is already logged in
+    if (await cookieJwtAuth(req, res)) {
+        logger.debug(`Login: User '${req.userData.username}' is already logged in`);
+        res.statusMessage = 'User is already logged in';
+        return res.status(403).end(); // 403 forbidden
+    }
+
     // check if all parameters are provided
     if (!username || !email || !password || !phoneNumber) {
         logger.debug(`Register: Missing parameters {username: ${username}, email: ${email}, password: ${password != "" && ("provided")}, phoneNumber: ${phoneNumber}}`)
@@ -73,6 +80,13 @@ authRouter.post('/register', async (req, res) => {
 authRouter.post('/login', async (req, res) => {
     const { username, password } = req.body;
 
+    // check if user is already logged in
+    if (await cookieJwtAuth(req, res)) {
+        logger.debug(`Login: User '${req.userData.username}' is already logged in`);
+        res.statusMessage = 'User is already logged in';
+        return res.status(403).end(); // 403 forbidden
+    }
+
     // check if all parameters are provided
     if (!username || !password) {
         logger.debug(`Login: Missing parameters { username: ${username}, password: ${password != "" && ("provided")}}`);
@@ -133,6 +147,13 @@ authRouter.post('/login', async (req, res) => {
 
 authRouter.post('/verify', async (req, res) => {
     const { username, smsToken } = req.body;
+
+    // check if user is already logged in
+    if (await cookieJwtAuth(req, res)) {
+        logger.debug(`Login: User '${req.userData.username}' is already logged in`);
+        res.statusMessage = 'User is already logged in';
+        return res.status(403).end(); // 403 forbidden
+    }
     
     //check if all parameters are provided
     if (!username || !smsToken) {

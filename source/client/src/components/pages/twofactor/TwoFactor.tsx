@@ -1,7 +1,22 @@
 import { css } from "@emotion/css";
-import { FC } from "react";
+import { FC, useEffect } from "react";
 
 export const TwoFactor: FC = () => {
+  useEffect(() => {
+    fetch("/api/auth/isAuthenticated", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }).then((response) => {
+      response.json().then((data) => {
+        if (data) {
+          window.location.href = "/dashboard";
+        }
+      });
+    });
+  }, []);
+
   const sumbitForm = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     fetch("/api/auth/verify", {
