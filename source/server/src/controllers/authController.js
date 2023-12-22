@@ -350,6 +350,8 @@ export const cookieJwtAuth = async (req, res) => {
 }
 
 export const checkUserAdmin = async (username) => {
+    logger.debug(`AuthController: Check if user '${username}' is admin`);
+
     const user = await User.findOne({
         where: {
             username: username
@@ -359,5 +361,10 @@ export const checkUserAdmin = async (username) => {
             attributes: ['name']
         }]
     });
-    return user.role.name === 'admin';
+    if (user.role.name === 'admin') {
+        logger.debug(`AuthController: User '${username}' is admin`);
+        return true;
+    }
+    logger.debug(`AuthController: User '${username}' is not admin`);
+    return false;
 }
