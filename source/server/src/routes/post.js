@@ -1,5 +1,5 @@
 import express from 'express';
-import { createPost, getAllPublishedPosts, getPublishedPostById, changePostStatus, addComment } from '../controllers/postController.js';
+import { createPost, getAllPublishedPosts, getUserPosts, getPublishedPostById, changePostStatus, addComment } from '../controllers/postController.js';
 import { cookieJwtAuth } from '../controllers/authController.js';
 import { logger } from '../logger/logger.js';
 import { User } from '../models/user.js';
@@ -14,6 +14,21 @@ export const postRouter = express.Router();
 postRouter.get('/', async (req, res) => {
     const posts = await getAllPublishedPosts().catch((err) => {
         logger.error('Post: Error while getting all published posts' + err);
+        res.statusMessage = 'Internal server error';
+        return res.status(500).end(); // 500 internal server error
+    });
+    res.send(posts);
+});
+
+postRouter.get('/userPosts', async (req, res) => {
+    // check if authenticated
+    if (!await cookieJwtAuth(req, res)) {
+        logger.debug('Post: Not authenticated');
+        return res.status(401).end(); // 401 unauthorized
+    }
+    
+    const posts = await getUserPosts(req.userData.username).catch((err) => {
+        logger.error('Post: Error while getting all user posts' + err);
         res.statusMessage = 'Internal server error';
         return res.status(500).end(); // 500 internal server error
     });
@@ -38,7 +53,7 @@ postRouter.post('/create', async (req, res) => {
     // check if authenticated
     if (!await cookieJwtAuth(req, res)) {
         logger.debug('Post: Not authenticated');
-        res.status(401).end(); // 401 unauthorized
+        return res.status(401).end(); // 401 unauthorized
     }
     
     const { title, content } = req.body;
@@ -62,7 +77,7 @@ postRouter.post('/update', async (req, res) => {
     // check if authenticated
     if (!await cookieJwtAuth(req, res)) {
         logger.debug('Post: Not authenticated');
-        res.status(401).end(); // 401 unauthorized
+        return res.status(401).end(); // 401 unauthorized
     }
     
     const { postId, status } = req.body;
@@ -136,7 +151,7 @@ postRouter.post('/comment', async (req, res) => {
     // check if authenticated
     if (!await cookieJwtAuth(req, res)) {
         logger.debug('Post: Not authenticated');
-        res.status(401).end(); // 401 unauthorized
+        return res.status(401).end(); // 401 unauthorized
     }
     
     const { postId, content } = req.body;

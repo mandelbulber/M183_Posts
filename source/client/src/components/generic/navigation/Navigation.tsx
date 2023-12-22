@@ -64,6 +64,9 @@ export const Navigation: FC = () => {
       `}>
         {loggedIn && (
           <>
+            <a href="/dashboard">
+              <h2>Dashboard</h2>
+            </a>
             <a onClick={logout}>
               <h2>Logout</h2>
             </a>

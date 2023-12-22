@@ -1,6 +1,7 @@
 import { Routes, Route } from 'react-router-dom'
 import { Navigation } from './components/generic/navigation/Navigation'
 import { TwoFactor } from './components/pages/twofactor/TwoFactor'
+import { Dashboard } from './components/pages/dashboard/Dashboard'
 import { Register } from './components/pages/register/Register'
 import { Profile } from './components/pages/profile/Profile'
 import { Login } from './components/pages/login/Login'
@@ -20,6 +21,7 @@ export const App: FC = () => {
         <Route path="/login" element={<Login />} />
         <Route path="/verify" element={<TwoFactor />} />
         <Route path="/profile" element={<Profile />} />
+        <Route path="/dashboard" element={<Dashboard />} />
       </Routes>
     </>
   )

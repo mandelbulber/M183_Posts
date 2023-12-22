@@ -11,7 +11,6 @@ export const Post: FC = () => {
     event.preventDefault();
     const userInputs = Object.fromEntries(new FormData(event.currentTarget));
     userInputs.postId = post.id;
-    userInputs.username = "Horst Konrader";
     fetch("/api/post/comment", {
       method: "POST",
       headers: {

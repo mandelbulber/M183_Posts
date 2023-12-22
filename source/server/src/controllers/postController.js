@@ -3,8 +3,9 @@ import { Status } from '../models/status.js';
 import { User } from '../models/user.js';
 import { Comment } from '../models/comment.js';
 import { logger } from '../logger/logger.js';
+import { Op } from 'sequelize';
 
-export const createPost = async (title, content,  username) => {
+export const createPost = async (title, content, username) => {
     await Post.create({
             title: title,
             content: content,
@@ -36,6 +37,30 @@ export const getAllPublishedPosts = async () => {
             attributes: ['name']
         },{
             model: User,
+            attributes: ['username']
+        }],
+        attributes: ['id', 'title', 'content']
+    }).then((posts) => {
+        return posts;
+    }).catch((err) => {
+        throw err;
+    });
+    return posts;
+}
+
+export const getUserPosts = async (username) => {
+    const user = await User.findOne({
+        where: {username: username},
+    });
+
+    const posts = await Post.findAll({
+        include: [{
+            model: Status,
+            where: {name: { [Op.ne]: 'deleted' }},
+            attributes: ['name']
+        },{
+            model: User,
+            where: {id: user.id},
             attributes: ['username']
         }],
         attributes: ['id', 'title', 'content']
