@@ -3,7 +3,7 @@
     src: url(./fonts/CircularXX.woff2);
 }
 
-html {
+* {
     font-family: CircularXX, sans-serif;
 }
 

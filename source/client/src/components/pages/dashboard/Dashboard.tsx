@@ -14,7 +14,7 @@ export const Dashboard: FC = () => {
       },
       body: JSON.stringify(userInputs),
     }).then((response) => {
-      if (response.status === 200) {
+      if (response.status === 201) {
         window.location.reload();
       }
     });
