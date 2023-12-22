@@ -27,6 +27,8 @@ export const createRelations = async () => {
     // User to Comment relationship
     User.hasMany(Comment, { foreignKey: 'userId' });
     Comment.belongsTo(User, { foreignKey: 'userId' });
+
+    logger.info('Seeding: Relations created');
 };
 
 export const seedDatabase = async () => {

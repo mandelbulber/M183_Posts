@@ -1,51 +1,38 @@
 import { css } from "@emotion/css";
-import { FC, useEffect } from "react";
+import { FC } from "react";
 
-export const TwoFactor: FC = () => {
-  useEffect(() => {
-    fetch("/api/auth/isAuthenticated", {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    }).then((response) => {
-      response.json().then((data) => {
-        if (data) {
-          window.location.href = "/dashboard";
-        }
-      });
-    });
-  }, []);
-
+export const Totp: FC = () => {
   const sumbitForm = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    fetch("/api/auth/verify", {
+    fetch("/api/auth/totp/verify", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        smsToken: Object.fromEntries(new FormData(event.currentTarget)).code,
-        username: localStorage.getItem("username"),
+        totpToken: Object.fromEntries(new FormData(event.currentTarget)).code,
+        totpSecret: Object.fromEntries(new FormData(event.currentTarget)).totpSecret,
       }),
     }).then((response) => {
       if (response.status === 200) {
-        localStorage.removeItem("username");
-        response.json().then((data) => {
-          console.log(data);
-          if(data.role === "admin" && data.totpSecret == null) {
-            window.location.href = "/setupTotp";
-          }
-        });
         window.location.href = "/dashboard";
-      } else if (response.status === 403) {
-        window.location.href = "/login";
       } else {
         document.getElementById("server_message")!.innerHTML =
           response.statusText;
       }
     });
   };
+
+  fetch("/api/auth/totp/setup").then((response) => {
+    if (response.status === 200) {
+        console.log("Koni")
+      response.json().then((data) => {
+        console.log(data);
+        document.getElementById("QrCode")!.setAttribute("src", data.qr);
+        document.getElementsByName("totpSecret")[0].setAttribute("value", data.secret);
+      });
+    }
+  });
 
   return (
     <div
@@ -61,9 +48,12 @@ export const TwoFactor: FC = () => {
         transform: translate(-50%, -50%);
       `}
     >
-      <h1>Verify your identity</h1>
-      <p>Enter your sms code</p>
+      <h1>Setup Time-based one-time password</h1>
+      <p>Scan QR-Code with an Authentification app: </p>
 
+      <img src="" alt="QrCode" id="QrCode"/>
+
+      <p>Enter your code: </p>
       <form
         onSubmit={sumbitForm}
         className={css`
@@ -87,6 +77,7 @@ export const TwoFactor: FC = () => {
             font-weight: bold;
           `}
         />
+        <input type="hidden" name="totpSecret" />
         <input type="text" name="code" placeholder="Code" />
         <input type="submit" value="Verify" />
       </form>

@@ -7,6 +7,7 @@ import { Profile } from './components/pages/profile/Profile'
 import { Login } from './components/pages/login/Login'
 import { Post } from './components/pages/post/Post'
 import { Home } from './components/pages/home/Home'
+import { Totp } from './components/pages/totp/Totp'
 import { FC } from 'react'
 import './App.css'
 
@@ -22,6 +23,7 @@ export const App: FC = () => {
         <Route path="/verify" element={<TwoFactor />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/setupTotp" element={<Totp />} />
       </Routes>
     </>
   )

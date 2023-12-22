@@ -45,6 +45,10 @@ User.init({
         type: DataTypes.DATE,
         allowNull: true
     },
+    totpSecret: {
+        type: DataTypes.STRING,
+        allowNull: true
+    },
 }, {
     sequelize,
     modelName: 'user'

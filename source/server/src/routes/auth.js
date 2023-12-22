@@ -3,6 +3,9 @@ import { checkEmailUsed, checkPasswordCorrect, checkSmsTokenCorrect, checkUserna
 import validator from 'validator';
 import jwt from 'jsonwebtoken';
 import { logger } from '../logger/logger.js';
+import { User } from '../models/user.js';
+import { Role } from '../models/role.js';
+import { generateSecret, verifyToken } from 'node-2fa';
 
 export const authRouter = express.Router();
 
@@ -213,13 +216,27 @@ authRouter.post('/verify', async (req, res) => {
         logger.error(`Verify: Failed login attempts resetting failed for user '${username}'` + err);
     });
 
+    // Get current user
+    const currentUser = await User.findOne({
+        include: [{
+            model: Role,
+            attributes: ['name'],
+        }],
+        where: {username: username}, 
+        attributes: ['totpSecret']
+    }).then((user) => {
+        return user;
+    }).catch((err) => {
+        logger.error(`Verify: User with username ${username} not found` + err);
+    });
+
     // generate jwt
     const token = jwt.sign({ username: username }, process.env.JWT_SECRET, { expiresIn: '1h' });
     res.cookie('jwt', token, { httpOnly: true, secure: true });
     logger.debug(`Verify: JWT generated for user '${username}'`);
 
     logger.info(`Verify: User '${username}' logged in`);
-    res.status(200).end(); // 200 ok
+    res.status(200).json({role: currentUser.role.name, totpSecret: currentUser.totpSecret}).end(); // 200 ok
 });
 
 authRouter.post('/logout', async (req, res) => {
@@ -257,5 +274,128 @@ authRouter.get('/profile', async (req, res) => {
     else {
         logger.debug(`Profile: User requested profile but is not logged in`);
         res.status(401).end(); // 401 unauthorized
+    }
+});
+
+authRouter.get('/totp', async (req, res) => {
+    // check if authenticated
+    if (!await cookieJwtAuth(req, res)) {
+        logger.debug('Auth: Not authenticated');
+        res.status(401).end(); // 401 unauthorized
+    }
+
+    // Get current user
+    const currentUser = await User.findOne({
+        include: [{
+            model: Role,
+            attributes: ['name'],
+        }],
+        where: {username: req.userData.username}, 
+        attributes: ['totpSecret']
+    }).then((user) => {
+        return user;
+    }).catch((err) => {
+        logger.error(`Auth: User with username ${req.userData.username} not found` + err);
+    });
+});
+
+authRouter.get('/totp/setup', async (req, res) => {
+    // check if authenticated
+    if (!await cookieJwtAuth(req, res)) {
+        logger.debug('Auth: Not authenticated');
+        res.status(401).end(); // 401 unauthorized
+    }
+
+    // Get current user
+    const currentUser = await User.findOne({
+        include: [{
+            model: Role,
+            attributes: ['name'],
+        }],
+        where: {username: req.userData.username}, 
+        attributes: ['totpSecret']
+    }).then((user) => {
+        return user;
+    }).catch((err) => {
+        logger.error(`Auth: User with username ${req.userData.username} not found` + err);
+    });
+
+    if (currentUser.role.name != 'admin') {
+        logger.debug(`Auth: User '${req.userData.username}' is not admin`);
+        res.status(403).end(); // 403 forbidden
+    }
+
+    // generate totp secret
+    const secret = generateSecret({ name: 'PostsAppOrSomething', account: req.userData.username });
+
+    res.status(200).send(secret);
+});
+
+authRouter.post('/totp/verify', async (req, res) => {
+    // check if authenticated
+    if (!await cookieJwtAuth(req, res)) {
+        logger.debug('Auth: Not authenticated');
+        res.status(401).end(); // 401 unauthorized
+    }
+
+    // Get current user
+    const currentUser = await User.findOne({
+        include: [{
+            model: Role,
+            attributes: ['name'],
+        }],
+        where: {username: req.userData.username}, 
+        attributes: ['totpSecret']
+    }).then((user) => {
+        return user;
+    }).catch((err) => {
+        logger.error(`Auth: User with username ${req.userData.username} not found` + err);
+    });
+
+    if (currentUser.role.name != 'admin') {
+        logger.debug(`Auth: User '${req.userData.username}' is not admin`);
+        res.status(403).end(); // 403 forbidden
+    }
+
+    if ( currentUser.totpSecret == null) {
+        const { totpToken, totpSecret } = req.body;
+
+        if (!totpToken || !totpSecret) {
+            logger.debug(`Auth: Missing parameters { totpToken: ${totpToken}, totpSecret: ${totpSecret} }}`);
+            res.statusMessage = 'Missing parameters';
+            return res.status(400).end(); // 400 bad request
+        }
+
+        const result = verifyToken(totpSecret, totpToken);
+
+        if(result && result.delta == 0){
+            await User.update({ totpSecret: totpSecret }, {
+                where: { username: req.userData.username }
+            }).then(() => {
+                logger.debug(`Auth: User '${req.userData.username}' enabled 2FA`);
+                res.status(200).end(); // 200 ok
+            }).catch((err) => {
+                logger.error(`Auth: User '${req.userData.username}' could not enable 2FA` + err);
+                res.statusMessage = "Internal server error please refresh and try again"
+                res.status(500).end(); // 500 internal server error
+            });
+        }else{
+            logger.debug(`Auth: TOTP Token '${totpToken}' doesn't match user '${req.userData.username}'`);
+            res.statusMessage = 'TOTP Token doesn\'t match user';
+            return res.status(401).end(); // 401 unauthorized
+        }
+    } else {
+        const { totpToken } = req.body;
+
+        const result = verifyToken(currentUser.totpSecret, totpToken);
+        
+        if(result && result.delta == 0){
+            logger.debug(`Auth: User '${req.userData.username}' verified 2FA`);
+            res.status(200).end(); // 200 ok
+        }else{
+            logger.debug(`Auth: TOTP Token '${totpToken}' doesn't match user '${req.userData.username}'`);
+            res.statusMessage = 'TOTP Token doesn\'t match user';
+            return res.status(401).end(); // 401 unauthorized
+        }
     }
 });
