@@ -28,6 +28,10 @@ User.init({
         type: DataTypes.STRING,
         allowNull: false
     },
+    recoveryCodes: {
+        type: DataTypes.STRING,
+        allowNull: true
+    },
     smsToken: {
         type: DataTypes.STRING,
         allowNull: true

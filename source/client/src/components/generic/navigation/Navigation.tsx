@@ -28,41 +28,47 @@ export const Navigation: FC = () => {
 
     setLoggedIn(false);
     redirect("/");
-    // todo: logout
   };
 
   return (
-    <div className={css`
-      background-color: #333;
-      color: #fff;
-      box-shadow: 0px 0px 14px 0px rgb(88 252 255 / 64%);
-      padding-inline: 10rem;
-
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    `}>
-      <a href="/" className={css`
-        text-decoration: none;
+    <div
+      className={css`
+        background-color: #333;
         color: #fff;
-      `}>
-        <h1>Posts App or somethin</h1>
-      </a>
-      <div className={css`
+        box-shadow: 0px 0px 14px 0px rgb(88 252 255 / 64%);
+        padding-inline: 10rem;
+
         display: flex;
         align-items: center;
         justify-content: space-between;
-
-        a {
-          margin-left: 1rem;
-          color: #fff;
+      `}
+    >
+      <a
+        href="/"
+        className={css`
           text-decoration: none;
-          border: none;
-          background-color: transparent;
-          cursor: pointer;
-        }
-      `}>
-        {loggedIn && (
+          color: #fff;
+        `}
+      >
+        <h1>Posts App or somethin</h1>
+      </a>
+      <div
+        className={css`
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+
+          a {
+            margin-left: 1rem;
+            color: #fff;
+            text-decoration: none;
+            border: none;
+            background-color: transparent;
+            cursor: pointer;
+          }
+        `}
+      >
+        {(loggedIn && (
           <>
             <a href="/dashboard">
               <h2>Dashboard</h2>
@@ -74,7 +80,7 @@ export const Navigation: FC = () => {
               <h2>Profile</h2>
             </a>
           </>
-        ) || (
+        )) || (
           <>
             <a href="/login">
               <h2>Login</h2>

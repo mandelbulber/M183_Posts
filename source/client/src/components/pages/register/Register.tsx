@@ -1,8 +1,10 @@
-import { FC, useEffect } from "react";
+import { FC, useEffect, useState } from "react";
 import { css } from "@emotion/css";
 
 // [req 2.1] [req 2.2]
 export const Register: FC = () => {
+  const [recoveryCodes, setRecoveryCodes] = useState([]);
+
   useEffect(() => {
     fetch("/api/auth/isAuthenticated", {
       method: "GET",
@@ -30,12 +32,18 @@ export const Register: FC = () => {
       ),
     }).then((response) => {
       if (response.status === 201) {
-        window.location.href = "/profile";
+        response.json().then((data) => {
+          setRecoveryCodes(JSON.parse(data));
+        });
       } else {
         document.getElementById("server_message")!.innerHTML =
           response.statusText;
       }
     });
+  };
+
+  const leavePage = () => {
+    window.location.href = "/profile";
   };
 
   const checkInput = () => {
@@ -96,80 +104,96 @@ export const Register: FC = () => {
         transform: translate(-50%, -50%);
       `}
     >
-      <h1>Register</h1>
+      {(recoveryCodes.length == 0 && (
+        <>
+          <h1>Register</h1>
 
-      <div
-        id="server_message"
-        className={css`
-          color: red;
-          font-weight: bold;
-        `}
-      />
+          <div
+            id="server_message"
+            className={css`
+              color: red;
+              font-weight: bold;
+            `}
+          />
 
-      <form
-        onSubmit={submitForm}
-        className={css`
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
+          <form
+            onSubmit={submitForm}
+            className={css`
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              justify-content: center;
 
-          input {
-            margin-bottom: 20px;
-          }
-          input:last-child {
-            margin-bottom: 0;
-          }
-        `}
-      >
-        <input
-          id="username"
-          type="text"
-          onChange={checkInput}
-          name="username"
-          placeholder="Username"
-        />
-        <input
-          id="email"
-          type="email"
-          onChange={checkInput}
-          name="email"
-          placeholder="Email"
-        />
-        <input
-          id="password"
-          type="password"
-          onChange={checkInput}
-          name="password"
-          placeholder="Password"
-        />
-        <input
-          id="phoneNumber"
-          type="tel"
-          onChange={checkInput}
-          name="phoneNumber"
-          placeholder="Phone Number"
-        />
-        <input id="submit" type="submit" value="Register" disabled />
-      </form>
+              input {
+                margin-bottom: 20px;
+              }
+              input:last-child {
+                margin-bottom: 0;
+              }
+            `}
+          >
+            <input
+              id="username"
+              type="text"
+              onChange={checkInput}
+              name="username"
+              placeholder="Username"
+            />
+            <input
+              id="email"
+              type="email"
+              onChange={checkInput}
+              name="email"
+              placeholder="Email"
+            />
+            <input
+              id="password"
+              type="password"
+              onChange={checkInput}
+              name="password"
+              placeholder="Password"
+            />
+            <input
+              id="phoneNumber"
+              type="tel"
+              onChange={checkInput}
+              name="phoneNumber"
+              placeholder="Phone Number"
+            />
+            <input id="submit" type="submit" value="Register" disabled />
+          </form>
 
-      <a
-        href="/login"
-        className={css`
-          margin-top: 1rem;
-          margin-bottom: 2rem;
-          color: aqua;
-        `}
-      >
-        Already have an account?
-      </a>
+          <a
+            href="/login"
+            className={css`
+              margin-top: 1rem;
+              margin-bottom: 2rem;
+              color: aqua;
+            `}
+          >
+            Already have an account?
+          </a>
 
-      <h4 id="pw_req_title">Password Requirements</h4>
-      <div id="pw_req_length">12 characters</div>
-      <div id="pw_req_uppercase">Uppercase letter</div>
-      <div id="pw_req_lowercase">Lowercase letter</div>
-      <div id="pw_req_number">Number</div>
-      <div id="pw_req_special">Special character</div>
+          <h4 id="pw_req_title">Password Requirements</h4>
+          <div id="pw_req_length">12 characters</div>
+          <div id="pw_req_uppercase">Uppercase letter</div>
+          <div id="pw_req_lowercase">Lowercase letter</div>
+          <div id="pw_req_number">Number</div>
+          <div id="pw_req_special">Special character</div>
+        </>
+      )) || (
+        <>
+          <h1>Here are your recovery codes</h1>
+          <p>Save these somewhere safe, we won't share them again</p>
+          <ul>
+            {recoveryCodes.map((code: string) => (
+              <li key={code}>{code}</li>
+            ))}
+          </ul>
+
+          <input type="submit" value="Continue" onClick={leavePage} />
+        </>
+      )}
     </div>
   );
 };

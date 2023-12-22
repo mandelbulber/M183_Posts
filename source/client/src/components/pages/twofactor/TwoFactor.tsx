@@ -33,7 +33,7 @@ export const TwoFactor: FC = () => {
         localStorage.removeItem("username");
         response.json().then((data) => {
           console.log(data);
-          if(data.role === "admin" && data.totpSecret == null) {
+          if (data.role === "admin" && data.totpSecret == null) {
             window.location.href = "/setupTotp";
           }
         });
@@ -62,7 +62,7 @@ export const TwoFactor: FC = () => {
       `}
     >
       <h1>Verify your identity</h1>
-      <p>Enter your sms code</p>
+      <p>Enter your sms code or one of your recovery codes</p>
 
       <form
         onSubmit={sumbitForm}

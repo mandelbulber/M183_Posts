@@ -130,8 +130,56 @@ export const checkSmsTokenAvailable = async (username) => {
     }
 }
 
+export const checkRecoveryCodeCorrect = async (username, recoveryCode) => {
+    logger.debug(`AuthController: Check if recovery code is correct for user '${username}'`);
 
-export const createUser = async (username, email, password, phoneNumber) => {
+    // get users recovery codes
+    const recoveryCodes = await User.findOne({
+        where: {
+            username: username
+        },
+        attributes: ['recoveryCodes']
+    }).then((user) => {
+        return user.dataValues.recoveryCodes;
+    }).catch((err) => {
+        logger.error(`AuthController: Error while getting recovery codes for user '${username}'`);
+        throw err;
+    });
+
+    // check if one of the recovery codes matches
+    const recoveryCodesArray = JSON.parse(recoveryCodes);
+    if (recoveryCodesArray.length) {
+        for (let i = 0; i < recoveryCodesArray.length; i++) {
+            if (recoveryCode === recoveryCodesArray[i]) {
+                logger.debug(`AuthController: Recovery code is correct for user '${username}'`);
+
+                // delete recovery code
+                recoveryCodesArray.splice(i, 1);
+                console.log("spliced: " + recoveryCodesArray);
+                await User.update({
+                    recoveryCodes: JSON.stringify(recoveryCodesArray)
+                }, {
+                    where: {
+                        username: username
+                    }
+                }).then(() => {
+                    logger.debug(`AuthController: Recovery code deleted for user '${username}'`);
+                }).catch((err) => {
+                    logger.error(`AuthController: Error while deleting recovery code for user '${username}'`);
+                    throw err;
+                });
+                return true;
+            }
+        }
+        logger.debug(`AuthController: Recovery code is not correct for user '${username}'`);
+        return false;
+    } else {
+        logger.debug(`AuthController: No recovery codes available for user '${username}'`);
+        return false;
+    }
+}
+
+export const createUser = async (username, email, password, phoneNumber, recoveryCodes) => {
     logger.debug(`AuthController: Create user with properties {username: '${username}', email: '${email}', phoneNumber: '${phoneNumber}'}`);
 
     // create user
@@ -142,6 +190,7 @@ export const createUser = async (username, email, password, phoneNumber) => {
             email: email,
             password: hashedPassword,
             phoneNumber: phoneNumber,
+            recoveryCodes: recoveryCodes
         },
     }).then(async (user) => {
         await Role.findOne({

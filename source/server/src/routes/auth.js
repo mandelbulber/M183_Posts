@@ -1,5 +1,5 @@
 import express from 'express';
-import { checkEmailUsed, checkPasswordCorrect, checkSmsTokenCorrect, checkUsernameUsed, cookieJwtAuth, createUser, getUserDetails, saveSmsToken, sendSmsToken, checkUserBlocked, incrementFailedLoginAttempts, resetFailedLoginAttempts, checkSmsTokenAvailable, checkUserAdmin } from '../controllers/authController.js';
+import { checkEmailUsed, checkPasswordCorrect, checkSmsTokenCorrect, checkUsernameUsed, cookieJwtAuth, createUser, getUserDetails, saveSmsToken, sendSmsToken, checkUserBlocked, incrementFailedLoginAttempts, resetFailedLoginAttempts, checkSmsTokenAvailable, checkUserAdmin, checkRecoveryCodeCorrect } from '../controllers/authController.js';
 import validator from 'validator';
 import jwt from 'jsonwebtoken';
 import { logger } from '../logger/logger.js';
@@ -65,7 +65,19 @@ authRouter.post('/register', async (req, res) => {
         return res.status(409).end(); // 409 conflict
     }
 
-    createUser(username, email, password, phoneNumber).then(() => {
+    // create recovery codes
+    const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    const recoveryCodes = [];
+    for (let i = 0; i < 10; i++) {
+        let recoveryCode = ""
+        // create 10 digit recovery code
+        for (let i = 0; i < 12; i++) {
+            recoveryCode += characters.charAt(Math.floor(Math.random() * characters.length))
+        }
+        recoveryCodes.push(recoveryCode);
+    }
+
+    createUser(username, email, password, phoneNumber, JSON.stringify(recoveryCodes)).then(() => {
         logger.info(`Register: User with username '${username}' created`);
 
         // generate jwt-token
@@ -73,7 +85,7 @@ authRouter.post('/register', async (req, res) => {
         res.cookie('jwt', token, { httpOnly: true, secure: true });
         logger.debug(`Register: JWT generated for user '${username}'`);
 
-        res.status(201).end(); // 201 created
+        res.status(201).json(JSON.stringify(recoveryCodes)).end(); // 201 created
     }).catch((err) => {
         logger.error(`Register: user creation failed for user ${username}` + err);
         res.status(500).end(); // 500 internal server error
@@ -193,20 +205,21 @@ authRouter.post('/verify', async (req, res) => {
         return res.status(401).end(); // 401 unauthorized
     }
 
-    // check if username and sms-token match [req. 2.9]
+    // check if username and sms-token or recovery code match [req. 2.9]
     if (!await checkSmsTokenCorrect(username, smsToken)) {
-        logger.debug(`Verify: SMS-Code '${smsToken}' doesn't match user '${username}'`);
-        res.statusMessage = 'SMS-Code doesn\'t match user';
-
-        // increment failed login attempts
-        logger.debug(`Verify: Incrementing failed login attempts for user '${username}'`);
-        await incrementFailedLoginAttempts(username).then(() => {
-            logger.debug(`Verify: Failed login attempts incremented for user '${username}'`);
-        }).catch((err) => {
-            logger.error(`Verify: Failed login attempts incrementing failed for user '${username}'` + err);
-        });
-        
-        return res.status(401).end(); // 401 unauthorized
+        if (!await checkRecoveryCodeCorrect(username, smsToken)) {
+            logger.debug(`Verify: Code '${smsToken}' doesn't match SMS token or recovery code for user '${username}'`);
+            res.statusMessage = 'Code doesn\'t match user';
+    
+            // increment failed login attempts
+            logger.debug(`Verify: Incrementing failed login attempts for user '${username}'`);
+            await incrementFailedLoginAttempts(username).then(() => {
+                logger.debug(`Verify: Failed login attempts incremented for user '${username}'`);
+            }).catch((err) => {
+                logger.error(`Verify: Failed login attempts incrementing failed for user '${username}'` + err);
+            });
+            return res.status(401).end(); // 401 unauthorized
+        }
     }
 
     // reset failed login attempts
