@@ -3,7 +3,7 @@ import { FC, useEffect, useState } from "react";
 
 export const Dashboard: FC = () => {
   const [posts, setPosts] = useState<any>();
-  const [isAdmin, setIsAdmin] = useState(true); // TODO: Change default to false and check for admin rights
+  const [isAdmin, setIsAdmin] = useState(false);
 
   const createPost = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -16,7 +16,7 @@ export const Dashboard: FC = () => {
       body: JSON.stringify(userInputs),
     }).then((response) => {
       if (response.status === 201) {
-        window.location.reload();
+        loadPosts();
       }
     });
   }
@@ -64,8 +64,21 @@ export const Dashboard: FC = () => {
   }
 
   useEffect(() => {
-    loadPosts();
+    fetch("/api/auth/isAdmin", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }).then((response) => {
+      response.json().then((data) => {
+        setIsAdmin(data);
+      });
+    });
   }, []);
+
+  useEffect(() => {
+    loadPosts();
+  }, [isAdmin]);
 
 
   return (

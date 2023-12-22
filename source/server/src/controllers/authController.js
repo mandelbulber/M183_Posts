@@ -348,3 +348,16 @@ export const cookieJwtAuth = async (req, res) => {
         return false;
     }
 }
+
+export const checkUserAdmin = async (username) => {
+    const user = await User.findOne({
+        where: {
+            username: username
+        },
+        include: [{
+            model: Role,
+            attributes: ['name']
+        }]
+    });
+    return user.role.name === 'admin';
+}

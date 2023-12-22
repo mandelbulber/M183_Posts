@@ -1,6 +1,6 @@
 import express from 'express';
 import { createPost, getAllPublishedPosts, getUserPosts, getAdminPosts, getPublishedPostById, changePostStatus, addComment } from '../controllers/postController.js';
-import { cookieJwtAuth } from '../controllers/authController.js';
+import { cookieJwtAuth, checkUserAdmin } from '../controllers/authController.js';
 import { logger } from '../logger/logger.js';
 import { User } from '../models/user.js';
 import { Post } from '../models/post.js';
@@ -42,7 +42,10 @@ postRouter.get('/adminPosts', async (req, res) => {
         return res.status(401).end(); // 401 unauthorized
     }
 
-    // TODO: Check if admin
+    if (!await checkUserAdmin(req.userData.username)) {
+        logger.debug('Post: Not admin');
+        return res.status(401).end(); // 401 unauthorized
+    }
     
     const posts = await getAdminPosts().catch((err) => {
         logger.error('Post: Error while getting all user posts' + err);

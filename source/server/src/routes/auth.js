@@ -1,5 +1,5 @@
 import express from 'express';
-import { checkEmailUsed, checkPasswordCorrect, checkSmsTokenCorrect, checkUsernameUsed, cookieJwtAuth, createUser, getUserDetails, saveSmsToken, sendSmsToken, checkUserBlocked, incrementFailedLoginAttempts, resetFailedLoginAttempts, checkSmsTokenAvailable } from '../controllers/authController.js';
+import { checkEmailUsed, checkPasswordCorrect, checkSmsTokenCorrect, checkUsernameUsed, cookieJwtAuth, createUser, getUserDetails, saveSmsToken, sendSmsToken, checkUserBlocked, incrementFailedLoginAttempts, resetFailedLoginAttempts, checkSmsTokenAvailable, checkUserAdmin } from '../controllers/authController.js';
 import validator from 'validator';
 import jwt from 'jsonwebtoken';
 import { logger } from '../logger/logger.js';
@@ -217,6 +217,14 @@ authRouter.get('/isAuthenticated', async (req, res) => {
         res.send(true);
     else
         res.send(false);
+});
+
+authRouter.get('/isAdmin', async (req, res) => {
+    const loggedIn = await cookieJwtAuth(req, res);
+    if (!loggedIn)
+        res.send(false);
+    else
+        res.send(await checkUserAdmin(req.userData.username));
 });
 
 authRouter.get('/profile', async (req, res) => {
