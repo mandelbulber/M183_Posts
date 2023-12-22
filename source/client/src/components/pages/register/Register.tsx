@@ -45,26 +45,11 @@ export const Register: FC = () => {
     const specialMet = /[^A-Za-z0-9]/.test(password);
 
     // hide met requirements
-    if (lengthMet)
-      document.getElementById("pw_req_length")!.hidden = true;
-    else
-      document.getElementById("pw_req_length")!.hidden = false;
-    if (uppercaseMet)
-      document.getElementById("pw_req_uppercase")!.hidden = true;
-    else
-      document.getElementById("pw_req_uppercase")!.hidden = false;
-    if (lowercaseMet)
-      document.getElementById("pw_req_lowercase")!.hidden = true;
-    else
-      document.getElementById("pw_req_lowercase")!.hidden = false;
-    if (numberMet)
-      document.getElementById("pw_req_number")!.hidden = true;
-    else
-      document.getElementById("pw_req_number")!.hidden = false;
-    if (specialMet)
-      document.getElementById("pw_req_special")!.hidden = true;
-    else
-      document.getElementById("pw_req_special")!.hidden = false;
+    document.getElementById("pw_req_length")!.hidden = lengthMet;
+    document.getElementById("pw_req_uppercase")!.hidden = uppercaseMet;
+    document.getElementById("pw_req_lowercase")!.hidden = lowercaseMet;
+    document.getElementById("pw_req_number")!.hidden = numberMet;
+    document.getElementById("pw_req_special")!.hidden = specialMet;
 
     // if password meets requirements, enable submit button
     if (lengthMet && uppercaseMet && lowercaseMet && numberMet && specialMet) {
