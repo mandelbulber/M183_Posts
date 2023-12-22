@@ -39,7 +39,7 @@ export const getAllPublishedPosts = async () => {
             model: User,
             attributes: ['username']
         }],
-        attributes: ['id', 'title', 'content']
+        attributes: ['id', 'title']
     }).then((posts) => {
         return posts;
     }).catch((err) => {
@@ -63,7 +63,7 @@ export const getUserPosts = async (username) => {
             where: {id: user.id},
             attributes: ['username']
         }],
-        attributes: ['id', 'title', 'content']
+        attributes: ['id', 'title']
     }).then((posts) => {
         return posts;
     }).catch((err) => {
