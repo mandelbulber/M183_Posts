@@ -118,8 +118,7 @@ export const Register: FC = () => {
       <a href="/login" className={css`
         margin-top: 1rem;
         margin-bottom: 2rem;
-        color: grey;
-        text-decoration: underline;
+        color: aqua;
       `}>Already have an account?</a>
 
       <h4 id="pw_req_title">Password Requirements</h4>

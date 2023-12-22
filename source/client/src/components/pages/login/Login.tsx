@@ -70,8 +70,7 @@ export const Login: FC = () => {
         className={css`
           margin-top: 1rem;
           margin-bottom: 2rem;
-          color: grey;
-          text-decoration: underline;
+          color: aqua;
         `}
       >
         Don't have an account yet?

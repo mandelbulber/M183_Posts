@@ -145,9 +145,9 @@ export const Dashboard: FC = () => {
                   margin-left: 30px;
                   font-size: inherit;
                   font-family: inherit;
+                  text-decoration: underline;
                   &:hover {
                     cursor: pointer;
-                    text-decoration: underline;
                   }
                   `}>
                       delete
