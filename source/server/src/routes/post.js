@@ -1,5 +1,5 @@
 import express from 'express';
-import { createPost, getAllPublishedPosts, getUserPosts, getPublishedPostById, changePostStatus, addComment } from '../controllers/postController.js';
+import { createPost, getAllPublishedPosts, getUserPosts, getAdminPosts, getPublishedPostById, changePostStatus, addComment } from '../controllers/postController.js';
 import { cookieJwtAuth } from '../controllers/authController.js';
 import { logger } from '../logger/logger.js';
 import { User } from '../models/user.js';
@@ -28,6 +28,23 @@ postRouter.get('/userPosts', async (req, res) => {
     }
     
     const posts = await getUserPosts(req.userData.username).catch((err) => {
+        logger.error('Post: Error while getting all user posts' + err);
+        res.statusMessage = 'Internal server error';
+        return res.status(500).end(); // 500 internal server error
+    });
+    res.send(posts);
+});
+
+postRouter.get('/adminPosts', async (req, res) => {
+    // check if authenticated
+    if (!await cookieJwtAuth(req, res)) {
+        logger.debug('Post: Not authenticated');
+        return res.status(401).end(); // 401 unauthorized
+    }
+
+    // TODO: Check if admin
+    
+    const posts = await getAdminPosts().catch((err) => {
         logger.error('Post: Error while getting all user posts' + err);
         res.statusMessage = 'Internal server error';
         return res.status(500).end(); // 500 internal server error

@@ -2,7 +2,8 @@ import { css } from "@emotion/css";
 import { FC, useEffect, useState } from "react";
 
 export const Dashboard: FC = () => {
-  const [userPosts, setUserPosts] = useState<any>();
+  const [posts, setPosts] = useState<any>();
+  const [isAdmin, setIsAdmin] = useState(true); // TODO: Change default to false and check for admin rights
 
   const createPost = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -22,21 +23,31 @@ export const Dashboard: FC = () => {
 
   const deletePost = (id: string) => {
     if (!window.confirm("Are you sure you want to delete this post?")) return;
+    setStatus(id, "deleted");
+  };
+
+  const setStatus = (id: string, status: string) => {
     fetch("/api/post/update", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ postId: id, status: "deleted" })
+      body: JSON.stringify({ postId: id, status: status })
     }).then((response) => {
       if (response.status === 200) {
-        window.location.reload();
+        loadPosts();
       }
     })
   };
 
-  useEffect(() => {
-    fetch("/api/post/userPosts", {
+  const loadPosts = () => {
+    let fetchUrl = "/api/post/";
+    if (isAdmin) {
+      fetchUrl += "adminPosts";
+    } else {
+      fetchUrl += "userPosts";
+    }
+    fetch(fetchUrl, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -44,12 +55,16 @@ export const Dashboard: FC = () => {
     }).then((response) => {
       if (response.status === 200) {
         response.json().then((data) => {
-          setUserPosts(data);
+          setPosts(data);
         });
       } else {
         window.location.href = "/login";
       }
     });
+  }
+
+  useEffect(() => {
+    loadPosts();
   }, []);
 
 
@@ -62,10 +77,10 @@ export const Dashboard: FC = () => {
       <h1 className={css`
         margin: 100px 0 50px;
         text-align: center;
-      `}>Dashboard</h1>
+      `}>Dashboard{isAdmin && (<> (Admin)</>)}</h1>
 
       <div>
-        {userPosts?.map((post: any) =>
+        {posts?.map((post: any) =>
           <div key={post.id} className={css`
                 border-bottom: 1px solid white;
                 display: flex;
@@ -83,26 +98,52 @@ export const Dashboard: FC = () => {
               `}>
             <h2>{post.title}</h2>
             <div>
-              {post.status.name}
-              <button onClick={() => deletePost(post.id)} className={css`
-                border: none;
-                background-color: transparent;
-                color: aqua;
-                padding: 0;
-                margin-left: 30px;
-                font-size: inherit;
-                font-family: inherit;
-                &:hover {
-                  cursor: pointer;
-                  text-decoration: underline;
-                }
-              `}>
-                delete
-              </button>
+              {isAdmin && (
+                <>
+                  {post.user.username}
+                  <select value={post.status.name} onChange={(event) => setStatus(post.id, event.currentTarget.value)} name="status" id="status"
+                    style={{ borderColor: post.status.name === "published" ? "green" : post.status.name === "hidden" ? "orange" : "red" }}
+                    className={css`
+                    min-width: 100px;
+                    margin-left: 30px;
+                    background-color: #1e1e1e;
+                    border: 1px solid white;
+                    color: white;
+                    padding: 8px 8px;
+                    border-radius: 10px;
+
+                    &:focus-visible {
+                      outline: none;
+                    }
+                  `}>
+                    <option value="deleted">deleted</option>
+                    <option value="hidden">hidden</option>
+                    {post.status.name !== "deleted" && (<option value="published">published</option>)}
+                  </select>
+                </>
+              ) || (
+                  <>
+                    {post.status.name}
+                    <button onClick={() => deletePost(post.id)} className={css`
+                  border: none;
+                  background-color: transparent;
+                  color: aqua;
+                  padding: 0;
+                  margin-left: 30px;
+                  font-size: inherit;
+                  font-family: inherit;
+                  &:hover {
+                    cursor: pointer;
+                    text-decoration: underline;
+                  }
+                  `}>
+                      delete
+                    </button>
+                  </>
+                )}
             </div>
           </div>
-        )
-        }
+        )}
       </div>
       <div className={css`
         margin-top: 100px;

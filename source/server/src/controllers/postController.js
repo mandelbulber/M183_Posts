@@ -72,6 +72,24 @@ export const getUserPosts = async (username) => {
     return posts;
 }
 
+export const getAdminPosts = async () => {
+    const posts = await Post.findAll({
+        include: [{
+            model: Status,
+            attributes: ['name']
+        },{
+            model: User,
+            attributes: ['username']
+        }],
+        attributes: ['id', 'title']
+    }).then((posts) => {
+        return posts;
+    }).catch((err) => {
+        throw err;
+    });
+    return posts;
+}
+
 export const getPublishedPostById = async (postId) => {
     const post = await Post.findOne({
         include: [
