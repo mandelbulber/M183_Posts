@@ -398,13 +398,13 @@ authRouter.post('/totp/verify', async (req, res) => {
             return res.status(401).end(); // 401 unauthorized
         }
     } else {
-        const { totpToken } = req.body;
+        const { totpToken, postId, status } = req.body;
 
         const result = verifyToken(currentUser.totpSecret, totpToken);
         
         if(result && result.delta == 0){
             logger.debug(`Auth: User '${req.userData.username}' verified 2FA`);
-            res.status(200).end(); // 200 ok
+            res.status(200).json({postId: postId, status: status}).end(); // 200 ok
         }else{
             logger.debug(`Auth: TOTP Token '${totpToken}' doesn't match user '${req.userData.username}'`);
             res.statusMessage = 'TOTP Token doesn\'t match user';

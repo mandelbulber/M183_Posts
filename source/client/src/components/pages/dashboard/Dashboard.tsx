@@ -1,9 +1,10 @@
 import { css } from "@emotion/css";
-import { FC, useEffect, useState } from "react";
+import { FC, useEffect, useRef, useState } from "react";
 
 export const Dashboard: FC = () => {
   const [posts, setPosts] = useState<any>();
   const [isAdmin, setIsAdmin] = useState(false);
+  const dialog = useRef<HTMLDialogElement>(null);
 
   const createPost = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -26,18 +27,63 @@ export const Dashboard: FC = () => {
     setStatus(id, "deleted");
   };
 
-  const setStatus = (id: string, status: string) => {
-    fetch("/api/post/update", {
+  const sumbitForm = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    fetch("/api/auth/totp/verify", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ postId: id, status: status }),
+      body: JSON.stringify({
+        totpToken: Object.fromEntries(new FormData(event.currentTarget)).code,
+        postId: Object.fromEntries(new FormData(event.currentTarget)).modaldataId, 
+        status: Object.fromEntries(new FormData(event.currentTarget)).modaldataStatus 
+      }),
     }).then((response) => {
       if (response.status === 200) {
-        loadPosts();
+        response.json().then((data) => {
+          fetch("/api/post/update", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ 
+              postId: data.postId, 
+              status: data.status 
+            }),
+          }).then((response) => {
+            if (response.status === 200) {
+              loadPosts();
+            }
+          });
+        });
+        dialog.current?.close();
+      } else {
+        document.getElementById("server_message")!.innerHTML =
+          response.statusText;
       }
     });
+  };
+
+  const setStatus = (id: string, status: string) => {
+    if(status === "published") {
+      dialog.current?.querySelector("input[name=modaldataId]")!.setAttribute("value", id);
+      dialog.current?.querySelector("input[name=modaldataStatus]")!.setAttribute("value", status);
+      dialog.current?.showModal();
+    }
+    else{
+      fetch("/api/post/update", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ postId: id, status: status }),
+      }).then((response) => {
+        if (response.status === 200) {
+          loadPosts();
+        }
+      });
+    }
   };
 
   const loadPosts = () => {
@@ -184,6 +230,63 @@ export const Dashboard: FC = () => {
             </div>
           </div>
         ))}
+        <div>
+            {(isAdmin && (
+              <>
+                <dialog 
+                  ref={dialog} 
+                  className={css`
+                    ::backdrop {
+                      background-color: black;
+                      opacity: 0.8;
+                    }
+                    background-color: #1e1e1e;
+                    border: 1px solid white;
+                    color: white;
+                    padding: 3em 3em;
+                  `}
+                >
+                    <h2
+                    className={css`
+                      margin-top: 0;
+                    `}
+                    >Enter your totp code: </h2>
+                    <form
+                      onSubmit={sumbitForm}
+                      className={css`
+                        
+                      `}
+                    >
+                      <div
+                        id="server_message"
+                        className={css`
+                          color: red;
+                          font-weight: bold;
+                        `}
+                      />
+                      <input type="hidden" name="modaldataId" />
+                      <input type="hidden" name="modaldataStatus" />
+                      <input type="text" name="code" placeholder="Code" />
+                      <input 
+                        type="submit" 
+                        value="Verify" 
+                        className={css`
+                            margin-left: 5px;
+                          `}
+                      />
+                      <input
+                        type="button"
+                        value="Cancel"
+                        onClick={() => dialog.current?.close()}
+                        className={css`
+                          margin-left: 5px;
+                        `}
+                      />
+                    </form>
+                  </dialog>
+              </>
+            ))}
+        </div>
       </div>
       <div
         className={css`
