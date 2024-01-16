@@ -173,6 +173,15 @@ export const Register: FC = () => {
           >
             Already have an account?
           </a>
+          <a 
+            href="https://github.com/login/oauth/authorize?client_id=37af0dc7e25266b0cbd0"
+            className={css`
+              margin-bottom: 1rem;
+              color: aqua;
+            `}
+          >
+            Register with Github
+          </a>
 
           <h4 id="pw_req_title">Password Requirements</h4>
           <div id="pw_req_length">12 characters</div>

@@ -2,6 +2,7 @@ import express from 'express';
 import { authRouter } from './routes/auth.js';
 import { postRouter } from './routes/post.js';
 import { postSecuredRouter } from './routes/postSecured.js';
+import { githubOAuthRouter } from './routes/githubOAuth.js';
 import { sequelize } from './database/database.js';
 import cookieParser from 'cookie-parser';
 import { createRelations, seedDatabase } from './database/alterDatabase.js';
@@ -20,7 +21,8 @@ app.use(cookieParser());
 // define routes
 app.use('/api/auth', authRouter);
 app.use('/api/post', postRouter);
-app.use('/api/posts', postSecuredRouter)
+app.use('/api/posts', postSecuredRouter);
+app.use('/api/auth', githubOAuthRouter);
 
 // database connection
 await createRelations().catch((err) => {

@@ -17,7 +17,7 @@ User.init({
     },
     email: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
         unique: true
     },
     password: {
@@ -51,6 +51,11 @@ User.init({
     },
     totpSecret: {
         type: DataTypes.STRING,
+        allowNull: true
+    },
+    githubId: {
+        type: DataTypes.STRING,
+        unique: true,
         allowNull: true
     },
 }, {
