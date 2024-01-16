@@ -94,7 +94,7 @@ export const Post: FC = () => {
           margin-bottom: 0;
         }
         `}>
-          <textarea name="content" placeholder="Comment" cols={50} rows={5}></textarea>
+          <textarea name="content" placeholder="Comment" cols={50} rows={5} maxLength={200}></textarea>
           <input type="submit" value="Comment" />
         </form>
       )}

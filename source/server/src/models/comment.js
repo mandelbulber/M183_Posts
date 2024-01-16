@@ -11,11 +11,17 @@ Comment.init({
         allowNull: false
     },
     content: {
-        type: DataTypes.STRING(200),
+        type: DataTypes.STRING,
         allowNull: false
     },
     
 }, {
     sequelize,
     modelName: 'comment'
+});
+
+Comment.beforeCreate((comment) => {
+    if (comment.content.length > 200) {
+        comment.content = comment.content.substring(0, 200);
+    }
 });
