@@ -32,7 +32,7 @@ authRouter.post('/register', async (req, res) => {
         res.statusMessage = 'Invalid email';
         return res.status(400).end(); // 400 bad request
     }
-    if (!validator.isStrongPassword(password, { minLength: 12, minLowercase: 1, minUppercase: 1, minNumbers: 1, minSymbols: 1 })) {
+    if (!password.match(/[^A-Za-z0-9]/)) {
         logger.debug('Register: Password not strong enough');
         res.statusMessage = 'Password not strong enough';
         return res.status(400).end(); // 400 bad request
