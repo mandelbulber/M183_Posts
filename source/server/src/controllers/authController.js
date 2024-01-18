@@ -183,7 +183,7 @@ export const createUser = async (username, email, password, phoneNumber, recover
     logger.debug(`AuthController: Create user with properties {username: '${username}', email: '${email}', phoneNumber: '${phoneNumber}'}`);
 
     // create user
-    const hashedPassword = await bcrypt.hash(password + process.env.PEPPER, 10);
+    const hashedPassword = await bcrypt.hash(password + process.env.PEPPER, 12);
     await User.findOrCreate({
         where: {
             username: username,

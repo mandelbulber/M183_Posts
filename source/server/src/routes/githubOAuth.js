@@ -31,7 +31,7 @@ githubOAuthRouter.get('/github/callback', async (req, res) => {
                     githubId: githubUser.id 
                 },
             }).then(async (user) => {
-                const hashedPassword = await bcrypt.hash(githubUser.login+githubUser.id+githubUser.created_at, 10);
+                const hashedPassword = await bcrypt.hash(githubUser.login+githubUser.id+githubUser.created_at, 12);
                 if (!user) {
                     //Create user
                     logger.debug(`OAuth: User '${githubUser.login}' not found in database. Creating new user.`);

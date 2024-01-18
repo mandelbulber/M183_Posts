@@ -83,7 +83,7 @@ export const seedDatabase = async () => {
     });
 
     // Create example users
-    const hashedPassword = await bcrypt.hash("#S3$UZe2K2*xjG" + process.env.PEPPER, 10)
+    const hashedPassword = await bcrypt.hash("#S3$UZe2K2*xjG" + process.env.PEPPER, 12)
     await User.findOrCreate({
         where: {
             username: 'username',
