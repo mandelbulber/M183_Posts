@@ -87,7 +87,7 @@ export const seedDatabase = async () => {
             username: 'username',
             email: 'username@email.com',
             // Password: #S3$UZe2K2*xjG
-            password: "$2a$10$/cE7hkbotQ50UYrK22ijuubmnWHxzVf9VN1Po8WPQp.Uk3riOyHh.",
+            password: "$2b$10$M3mdlN6yyx5fi.r8.xKpa.xs2FVcImcqqNy8UHA9b/u2dsmyYKbwu",
             phoneNumber: process.env.PHONE_NUMBER,
         },
     }).then(async (user) => {
@@ -110,7 +110,7 @@ export const seedDatabase = async () => {
             username: 'admin',
             email: 'admin@email.com',
             // Password: #S3$UZe2K2*xjG
-            password: "$2a$10$/cE7hkbotQ50UYrK22ijuubmnWHxzVf9VN1Po8WPQp.Uk3riOyHh.",
+            password: "$2b$10$M3mdlN6yyx5fi.r8.xKpa.xs2FVcImcqqNy8UHA9b/u2dsmyYKbwu",
             phoneNumber: process.env.PHONE_NUMBER,
         },
     }).then(async (user) => {

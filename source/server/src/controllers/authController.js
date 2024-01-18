@@ -59,7 +59,7 @@ export const checkPasswordCorrect = async (username, password) => {
 
     // compare passwords
     if (hashedPassword) {
-        if (await bcrypt.compare(password, hashedPassword)) {
+        if (await bcrypt.compare(password + process.env.PEPPER, hashedPassword)) {
             logger.debug(`AuthController: Password is correct for user '${username}'`);
             return true;
         } else {
@@ -183,7 +183,7 @@ export const createUser = async (username, email, password, phoneNumber, recover
     logger.debug(`AuthController: Create user with properties {username: '${username}', email: '${email}', phoneNumber: '${phoneNumber}'}`);
 
     // create user
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = await bcrypt.hash(password + process.env.PEPPER, 10);
     await User.findOrCreate({
         where: {
             username: username,
