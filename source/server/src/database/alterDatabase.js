@@ -4,6 +4,7 @@ import { Post } from '../models/post.js';
 import { Comment } from '../models/comment.js';
 import { Status } from '../models/status.js';
 import { logger } from '../logger/logger.js';
+import bcrypt from 'bcrypt';
 
 export const createRelations = async () => {
     logger.info('Seeding: Create relations');
@@ -82,12 +83,12 @@ export const seedDatabase = async () => {
     });
 
     // Create example users
+    const hashedPassword = await bcrypt.hash("#S3$UZe2K2*xjG" + process.env.PEPPER, 10)
     await User.findOrCreate({
         where: {
             username: 'username',
             email: 'username@email.com',
-            // Password: #S3$UZe2K2*xjG
-            password: "$2b$10$M3mdlN6yyx5fi.r8.xKpa.xs2FVcImcqqNy8UHA9b/u2dsmyYKbwu",
+            password: hashedPassword,
             phoneNumber: process.env.PHONE_NUMBER,
         },
     }).then(async (user) => {
@@ -109,8 +110,7 @@ export const seedDatabase = async () => {
         where: {
             username: 'admin',
             email: 'admin@email.com',
-            // Password: #S3$UZe2K2*xjG
-            password: "$2b$10$M3mdlN6yyx5fi.r8.xKpa.xs2FVcImcqqNy8UHA9b/u2dsmyYKbwu",
+            password: hashedPassword,
             phoneNumber: process.env.PHONE_NUMBER,
         },
     }).then(async (user) => {
