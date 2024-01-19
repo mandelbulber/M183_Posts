@@ -30,8 +30,7 @@ export const Login: FC = () => {
         localStorage.setItem("username", userInputs.username.toString());
         window.location.href = "/verify";
       } else {
-        document.getElementById("server_message")!.innerHTML =
-          response.statusText;
+        document.getElementById("server_message")!.innerText = response.statusText;
       }
     });
   };

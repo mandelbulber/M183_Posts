@@ -41,8 +41,7 @@ export const TwoFactor: FC = () => {
       } else if (response.status === 403) {
         window.location.href = "/login";
       } else {
-        document.getElementById("server_message")!.innerHTML =
-          response.statusText;
+        document.getElementById("server_message")!.innerText = response.statusText;
       }
     });
   };

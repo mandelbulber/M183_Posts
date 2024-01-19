@@ -59,8 +59,7 @@ export const Dashboard: FC = () => {
         });
         dialog.current?.close();
       } else {
-        document.getElementById("server_message")!.innerHTML =
-          response.statusText;
+        document.getElementById("server_message")!.innerText = response.statusText;
       }
     });
   };

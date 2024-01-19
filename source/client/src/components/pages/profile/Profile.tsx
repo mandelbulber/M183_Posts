@@ -35,7 +35,7 @@ export const Profile: FC = () => {
       if (response.status === 201) {
         window.location.reload();
       } else {
-        document.getElementById("errorMessage")!.innerText = "Invalid SMS Code";
+        document.getElementById("server_message")!.innerText = "Invalid SMS Code";
       }
     });
   }
@@ -126,7 +126,7 @@ export const Profile: FC = () => {
           `}>
           <input type="text" name="smsToken" id="smsToken" placeholder="SMS Code" />
           <input type="submit" value="Update Phone Number" />
-          <span id="errorMessage" className={css`
+          <span id="server_message" className={css`
           color: red;
           font-weight: bold;`}></span>
         </form>

@@ -36,8 +36,7 @@ export const Register: FC = () => {
           setRecoveryCodes(JSON.parse(data));
         });
       } else {
-        document.getElementById("server_message")!.innerHTML =
-          response.statusText;
+        document.getElementById("server_message")!.innerText = response.statusText;
       }
     });
   };

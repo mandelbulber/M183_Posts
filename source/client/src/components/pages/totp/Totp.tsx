@@ -17,8 +17,7 @@ export const Totp: FC = () => {
       if (response.status === 200) {
         window.location.href = "/dashboard";
       } else {
-        document.getElementById("server_message")!.innerHTML =
-          response.statusText;
+        document.getElementById("server_message")!.innerText = response.statusText;
       }
     });
   };
