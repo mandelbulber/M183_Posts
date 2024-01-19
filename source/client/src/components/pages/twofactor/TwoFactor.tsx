@@ -32,12 +32,12 @@ export const TwoFactor: FC = () => {
       if (response.status === 200) {
         localStorage.removeItem("username");
         response.json().then((data) => {
-          console.log(data);
-          if (data.role === "admin" && data.totpSecret == null) {
+          if (data.role == "admin" && data.totpSecret == null) {
             window.location.href = "/setupTotp";
+          } else {
+            window.location.href = "/dashboard";
           }
         });
-        window.location.href = "/dashboard";
       } else if (response.status === 403) {
         window.location.href = "/login";
       } else {

@@ -24,10 +24,10 @@ export const Navigation: FC = () => {
       headers: {
         "Content-Type": "application/json",
       },
+    }).then(() => {
+      setLoggedIn(false);
+      redirect("/");
     });
-
-    setLoggedIn(false);
-    redirect("/");
   };
 
   return (
