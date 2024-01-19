@@ -24,9 +24,11 @@ export const Navigation: FC = () => {
       headers: {
         "Content-Type": "application/json",
       },
-    }).then(() => {
-      setLoggedIn(false);
-      redirect("/");
+    }).then((response) => {
+      if (response.status === 200) {
+        setLoggedIn(false);
+        window.location.href = "/";
+      }      
     });
   };
 
