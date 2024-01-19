@@ -1,5 +1,5 @@
 import express from 'express';
-import { checkEmailUsed, checkPasswordCorrect, checkSmsTokenCorrect, checkUsernameUsed, cookieJwtAuth, createUser, getUserDetails, saveSmsToken, sendSmsToken, checkUserBlocked, incrementFailedLoginAttempts, resetFailedLoginAttempts, checkSmsTokenAvailable, checkUserAdmin, checkRecoveryCodeCorrect } from '../controllers/authController.js';
+import { checkEmailUsed, checkPasswordCorrect, checkSmsTokenCorrect, checkUsernameUsed, cookieJwtAuth, createUser, getUserDetails, saveSmsToken, sendSmsToken, checkUserBlocked, incrementFailedLoginAttempts, resetFailedLoginAttempts, checkSmsTokenAvailable, checkUserAdmin, checkRecoveryCodeCorrect, updatePhoneNumber, savePhoneNumberUpdateRequest, sendSmsTokenToNumber } from '../controllers/authController.js';
 import validator from 'validator';
 import jwt from 'jsonwebtoken';
 import { logger } from '../logger/logger.js';
@@ -410,5 +410,49 @@ authRouter.post('/totp/verify', async (req, res) => {
             res.statusMessage = 'TOTP Token doesn\'t match user';
             return res.status(401).end(); // 401 unauthorized
         }
+    }
+});
+
+authRouter.post('/requestPhoneNumberUpdate', async (req, res) => {
+    const loggedIn = await cookieJwtAuth(req, res);
+    if (!loggedIn) {
+        logger.debug('PhoneNumberUpdate: User requested update of phone number but is not logged in');
+        res.status(401).end();
+        return;
+    }
+    
+    const smsToken = Math.floor(100000 + Math.random() * 900000)
+    const username = req.userData.username;
+    savePhoneNumberUpdateRequest(username, req.body.phoneNumber, smsToken).then(() => {
+        logger.debug(`PhoneNumberUpdate: SMS token generated for user '${username}'`);
+        res.status(201).end();
+    }).catch((err) => {
+        logger.error(`PhoneNumberUpdate: SMS token generation failed for user '${username}'` + err);
+        res.status(500).end();
+    });
+    
+    sendSmsTokenToNumber(req.body.phoneNumber, smsToken).then(() => {
+        logger.info(`PhoneNumberUpdate: SMS token sent to user '${username}'`);
+        res.status(201).end();
+    }).catch((err) => {
+        logger.error(`PhoneNumberUpdate: SMS token sending failed for user '${username}'` + err);
+        res.status(500).end();
+    });
+});
+
+authRouter.post('/verifyPhoneNumberUpdate', async (req, res) => {
+    const loggedIn = await cookieJwtAuth(req, res);
+    if (!loggedIn) {
+        logger.debug('PhoneNumberUpdate: User requested update of phone number but is not logged in');
+        res.status(401).end();
+        return;
+    }
+    
+    if (await updatePhoneNumber(req.userData.username, req.body.smsToken)) {
+        logger.info(`PhoneNumberUpdate: User '${req.userData.username}' updated phone number`);
+        res.status(201).end();
+    } else {
+        logger.error(`PhoneNumberUpdate: User '${req.userData.username}' could not update phone number`);
+        res.status(500).end();
     }
 });

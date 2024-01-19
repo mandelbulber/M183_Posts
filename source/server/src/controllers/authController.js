@@ -1,5 +1,6 @@
 import { User } from '../models/user.js';
 import { Role } from '../models/role.js';
+import { PhoneNumberUpdateRequest } from '../models/phoneNumberUpdateRequest.js';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { logger } from '../logger/logger.js';
@@ -347,15 +348,19 @@ export const saveSmsToken = async (username, smsToken) => {
 export const sendSmsToken = async (username, smsToken) => {
     logger.debug(`AuthController: Send SMS code ${smsToken} to user '${username}'`);
 
-    // get phone number for username
     const user = await User.findOne({
         where: {
             username: username
         },
     });
 
+    sendSmsTokenToNumber(user.phoneNumber, smsToken);
+}
+
+export const sendSmsTokenToNumber = async (phoneNumber, smsToken) => {
+    
     const payload = {
-        "mobileNumber": user.phoneNumber.substring(1),
+        "mobileNumber": phoneNumber.substring(1),
         "message": "Your sms token is: " + smsToken + "."
     };
 
@@ -367,9 +372,9 @@ export const sendSmsToken = async (username, smsToken) => {
         },
         body: JSON.stringify(payload),
     }).then(() => {
-        logger.debug(`AuthController: SMS code ${smsToken} sent to user '${username}'`);
+        logger.debug(`AuthController: SMS code ${smsToken} sent to '${phoneNumber}'`);
     }).catch((err) => {
-        logger.error(`AuthController: Error while sending SMS code ${smsToken} to user '${username}': ${err}`);
+        logger.error(`AuthController: Error while sending SMS code ${smsToken} to '${phoneNumber}': ${err}`);
         throw err;
     });
 }
@@ -416,4 +421,63 @@ export const checkUserAdmin = async (username) => {
     }
     logger.debug(`AuthController: User '${username}' is not admin`);
     return false;
+}
+
+export const savePhoneNumberUpdateRequest = async (username, phoneNumber, smsToken) => {
+    logger.debug(`AuthController: Save phone number update request for user '${username}'`);
+    const user = await User.findOne({
+        where: {
+            username: username
+        }
+    });
+
+    await user.addPhoneNumberUpdateRequest(await PhoneNumberUpdateRequest.create({
+        phoneNumber: phoneNumber,
+        smsToken: smsToken,
+    })).then(() => {
+        logger.debug(`AuthController: Phone number update request saved for user '${username}'`);
+    }).catch((err) => {
+        logger.error(`AuthController: Error while saving phone number update request for user '${username}': ${err}`);
+        throw err;
+    });
+}
+
+export const updatePhoneNumber = async (username, smsToken) => {
+    logger.debug(`AuthController: Update phone number for user '${username}'`);
+
+    const phoneNumberUpdateRequest = await PhoneNumberUpdateRequest.findOne({
+        where: {
+            smsToken: smsToken
+        },
+        include: [{
+            model: User,
+            attributes: ['username'],
+            where: {
+                username: username
+            }
+        }],
+    });
+    console.log(JSON.stringify(phoneNumberUpdateRequest));
+
+    if (!phoneNumberUpdateRequest) {
+        logger.debug(`AuthController: Could not found phone number request for '${username}' with corresponding sms token`);
+        return false;
+    }
+
+    let success = await User.update({
+        phoneNumber: phoneNumberUpdateRequest.phoneNumber
+    }, {
+        where: {
+            username: username
+        }
+    }).then(() => {
+        logger.debug(`AuthController: Phone number updated for user '${username}'`);
+        return true;
+    }).catch((err) => {
+        logger.error(`AuthController: Error while updating phone number for user '${username}': ${err}`);
+        return false;
+    });
+
+    await phoneNumberUpdateRequest.destroy();
+    return success;
 }

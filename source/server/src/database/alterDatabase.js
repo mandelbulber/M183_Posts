@@ -3,6 +3,7 @@ import { User } from '../models/user.js';
 import { Post } from '../models/post.js';
 import { Comment } from '../models/comment.js';
 import { Status } from '../models/status.js';
+import { PhoneNumberUpdateRequest } from '../models/phoneNumberUpdateRequest.js';
 import { logger } from '../logger/logger.js';
 import bcrypt from 'bcrypt';
 
@@ -28,6 +29,10 @@ export const createRelations = async () => {
     // User to Comment relationship
     User.hasMany(Comment, { foreignKey: 'userId' });
     Comment.belongsTo(User, { foreignKey: 'userId' });
+
+    // User to PhoneNumberUpdateRequest relationship
+    User.hasMany(PhoneNumberUpdateRequest, { foreignKey: 'userId' });
+    PhoneNumberUpdateRequest.belongsTo(User, { foreignKey: 'userId' });
 
     logger.info('Seeding: Relations created');
 };
