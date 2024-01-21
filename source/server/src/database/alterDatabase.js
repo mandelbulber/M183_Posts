@@ -38,6 +38,10 @@ export const createRelations = async () => {
 };
 
 export const seedDatabase = async () => {
+    if (await User.findOne({ where: { username: 'admin' } }) != null) {
+        logger.info('Seeding: Database already seeded');
+        return;
+    }
     logger.info('Seeding: Seeding database');
 
     // Create roles
