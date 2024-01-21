@@ -19,9 +19,42 @@ Gehashed wird die Kombination des Passworts und des Peppers mit dem bcrypt-Algor
 Auch wenn weitere Verbesserungsmöglichkeiten bestehen würden, sind wir der Meinung, dass dieses Verfahren für eine Applikation zur Erstellung von Posts sicher genug ist.
 
 # 8.2 Bibliotheken und externe Code-Bestandteile
+- Backend
+    - [bcrypt](https://www.npmjs.com/package/bcrypt): 
+        - Bcrypt wird verwendet, um das Passwort zu hashen und zu salten.
+
+    - [cookie-parser](https://www.npmjs.com/package/cookie-parser): 
+        - Cookie-Parser wird verwendet, um Cookies zu verarbeiten.
+
+    - [dotenv](https://www.npmjs.com/package/dotenv): 
+        - Detenv wird verwendet, um Umgebungsvariablen zu laden und verwenden.
+
+    - [express](https://www.npmjs.com/package/express): 
+        - Express wird verwendet, um den API-Server zu erstellen.
+
+    - ["jsonwebtoken"](https://www.npmjs.com/package/jsonwebtoken): 
+        - Jsonwebtoken wird verwendet, um JWTs zu erstellen und zu verifizieren. Diese werden für die Authentifizierung verwendet.
+
+    - [node-2fa](https://www.npmjs.com/package/node-2fa): 
+        - Node-2fa wird verwendet, um 2FA-Tokens zu erstellen und zu verifizieren. Dies wird bei den Admins, zum Publishen der Posts verwendet.
+
+    - [sequelize](https://www.npmjs.com/package/sequelize): 
+        - Sequelize ist ein Datenbank-ORM (Object-Relational-Mapper) welches die Interaktion mit der Datenbank vereinfacht.
+
+    - [sqlite3](https://www.npmjs.com/package/sqlite3): 
+        - Sqlite3 wird verwendet, um die Datenbank zu erstellen und zu verwalten.
+
+    - [validator](https://www.npmjs.com/package/validator): 
+        - Validator wird verwendet, um die Eingaben der Benutzer zu validieren. 
+
+    - [winston](https://www.npmjs.com/package/winston): 
+        - Winston wird verwendet, um Logs zu erstellen.
+
+    - [nodemon](https://www.npmjs.com/package/nodemon):
+        - Nodemon wird für das automatische Neustarten des Dev-Servers bei Änderungen verwendet.
 
 # 8.3 Schutz gegen XSS-Attacken
-
+    
 # 8.4 Zugangsdaten
 
 For the sake of fulfilling the requirement 8.4, two users will be seeded for testing purposes. These are their login information:

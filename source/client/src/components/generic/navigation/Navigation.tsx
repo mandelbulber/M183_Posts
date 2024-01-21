@@ -1,6 +1,5 @@
 import { css } from "@emotion/css";
 import { FC, useEffect, useState } from "react";
-import { redirect } from "react-router-dom";
 
 export const Navigation: FC = () => {
   const [loggedIn, setLoggedIn] = useState(false);
