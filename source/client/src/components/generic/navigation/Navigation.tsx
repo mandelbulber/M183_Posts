@@ -27,7 +27,7 @@ export const Navigation: FC = () => {
     }).then((response) => {
       if (response.status === 200) {
         setLoggedIn(false);
-        window.location.href = "/";
+        window.location.href = "/login";
       }      
     });
   };
