@@ -1,3 +1,36 @@
+# 7.1 Logging Konzept
+
+Für das Logging in unserer Applikation haben wir die Winston library verwendet. Damit können wir mit einer einfachen Konfiguration im [logger.js File](source\server\src\logger\logger.js) festlegen, welche Logging Stufen wohin wir speichern wollen. Für unsere Applikation haben wir uns für drei Zielorte entschieden:
+
+- Zu Debugging Zwecken werden alle Logs des Levels debug (und darüber) in die Konsole geschrieben
+- Im dedizierten [combined.log](source\server\logs\combined.log) File werden alle Logs, inklusive silly, gespeichert. Darin befinden sich logs von allen Events, um bei einem Fehler die genaue Ursache zu finden.
+- In einem [error.log](source\server\logs\error.log) File werden nur die Error Meldungen gespeichert. Es ermöglicht einen direkten Blick auf allfällige Fehler in der Applikation.
+
+## 7.1.2 Logging Stufen
+
+Die Winston library bietet verschiedene Logging Stufen an. Sämtliche Arten von Events unserer Applikation haben wir jeweils einer Stufe zugeordnet. Die Stufen sind:
+- **error**: Nur Applikationsfehler, die von einem Entwickler behoben werden müssen
+- **warn**: Warnungen, die die Applikation nicht zum Absturz bringen, aber dennoch von einem Entwickler angeschaut werden sollten
+- **info**: Alle grösseren Events, die in der Applikation passieren. Beispielsweise das Erstellen eines Posts oder das erfolgreiche Login eines Benutzers
+- **debug**: Alle Events, die für das Debugging der Applikation nützlich sind. Beinhaltet Schritte jeder durchlaufenen Funktion, um Fehler genau reproduzieren zu können. Umfasst auch fehlgeschlagene User-Events.
+- **silly**: Events, die in Debugging Fällen nützlich sein können, aber das normale Debugging erwschweren und zumüllen würden. Beispielsweise das Loggen von allen Datenbank-Queries 
+
+Bei sämtlichen Logs wird jeweils der Benutzername mitgeloggt, der das Event ausgelöst hat. Sensible Daten wie Passwörter oder Tokens werden bewusst nicht geloggt.
+
+## 7.1.3 Logging Format
+
+Alle Logs werden in folgendem Format gespeichert:
+
+[**timestamp**] [**level**] [**message**]
+
+## 7.1.4 Logging in einem produktiven Umfeld
+
+Wir haben für dieses Projekt ein sehr vereinfachtes Logging Konzept verwendet. 
+Folgende Verbesserungen würden wir in einem Produktivumfeld vornehmen:
+- Einige Pesonenspezifische Daten wie die Email und Telefonnummer werden aktuell noch geloggt. Diese würden wir in einem weiteren Schritt entfernen, um das Datenschutzkonzept garantiert einzuhalten. Nach [diesem Artikel](https://gdpr-info.eu/issues/personal-data) gelten die Email und Telefonnummer klar als Persönliche Daten, weshalb eine Verwendung davon in den Logfiles überdenkt werden sollte.
+- Die Silly Logs bestehen im Moment rein aus den Datenbank-Queries. Diese enthalten teils kritische Daten wie die gehashten Passwörter sowie den bereits genannten Emails und Telefonnummern. Auch hier wäre eine Überarbeitung sinnvoll.
+- Wir würden das Loggen von IP-Adressen, hinzufügen, um die Herkunft von Events nachvollziehen zu können. Bei einem global genutzten Produkt könnte man beispielsweise erkennen, wenn gewisse Regionen von der Applikation ausgeschlossen wären. Ebenfalls können Bruteforce-Attacken erkannt werden und mit etwas erweiterter Logik blockiert werden.
+
 # 8.1 Verfahren von Speicherung der Passwörter
 
 Um das Passwort auf eine sichere Art und Weise zu speichern, speicherten wir das Passwort nicht als Plain-Text in der Datenbank ab.
@@ -91,4 +124,3 @@ For the sake of fulfilling the requirement 8.4, two users will be seeded for tes
 | User  | username | #S3$UZe2K2*xjG |
 
 As already mentioned, the phone numbers for those users is defined using environment variables that are defined in the [.env-File](./source/server/.env). Make sure to change these accordingly before the seeding happens, in order to receive the 2FA SMS token.
-
