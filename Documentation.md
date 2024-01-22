@@ -19,6 +19,7 @@ Gehashed wird die Kombination des Passworts und des Peppers mit dem bcrypt-Algor
 Auch wenn weitere Verbesserungsmöglichkeiten bestehen würden, sind wir der Meinung, dass dieses Verfahren für eine Applikation zur Erstellung von Posts sicher genug ist.
 
 # 8.2 Bibliotheken und externe Code-Bestandteile
+
 - Backend
     - [bcrypt](https://www.npmjs.com/package/bcrypt): 
         - Bcrypt wird verwendet, um das Passwort zu hashen und zu salten.
@@ -32,11 +33,11 @@ Auch wenn weitere Verbesserungsmöglichkeiten bestehen würden, sind wir der Mei
     - [express](https://www.npmjs.com/package/express): 
         - Express wird verwendet, um den API-Server zu erstellen.
 
-    - ["jsonwebtoken"](https://www.npmjs.com/package/jsonwebtoken): 
+    - [jsonwebtoken](https://www.npmjs.com/package/jsonwebtoken): 
         - Jsonwebtoken wird verwendet, um JWTs zu erstellen und zu verifizieren. Diese werden für die Authentifizierung verwendet.
 
     - [node-2fa](https://www.npmjs.com/package/node-2fa): 
-        - Node-2fa wird verwendet, um 2FA-Tokens zu erstellen und zu verifizieren. Dies wird bei den Admins, zum Publishen der Posts verwendet.
+        - Node-2fa wird verwendet, um 2FA-Tokens zu erstellen und zu verifizieren. Dies wird bei den Admins, beim veröffentlichen eines Posts verwendet.
 
     - [sequelize](https://www.npmjs.com/package/sequelize): 
         - Sequelize ist ein Datenbank-ORM (Object-Relational-Mapper) welches die Interaktion mit der Datenbank vereinfacht.
@@ -53,8 +54,33 @@ Auch wenn weitere Verbesserungsmöglichkeiten bestehen würden, sind wir der Mei
     - [nodemon](https://www.npmjs.com/package/nodemon):
         - Nodemon wird für das automatische Neustarten des Dev-Servers bei Änderungen verwendet.
 
+- Frontend
+  - Selbst hinzugefügte Libraries:
+    - [@emotion/css](https://www.npmjs.com/package/@emotion/css): 
+      - Emotion-CSS wird verwendet um das Styling der Komponenten zu vereinfachen. Es ermöglicht das Verwenden des standard CSS-Syntaxes anstelle der eher mühsamen Schreibweise in React. 
+
+    - [react-router-dom](https://www.npmjs.com/package/react-router-dom): 
+      - React-Router-Dom wird verwendet, um die Navigation zwischen den Seiten zu ermöglichen.
+
+  - Standard Libraries
+    - Die folgenden Libraries wurden automatisch beim Setup (Vite und Typescript) importiert:
+      - [react](https://www.npmjs.com/package/react)
+      - [react-dom](https://www.npmjs.com/package/react-dom)
+      - [@types/react](https://www.npmjs.com/package/@types/react)
+      - [@types/react-dom](https://www.npmjs.com/package/@types/react-dom)
+      - [@typescript-eslint/eslint-plugin](https://www.npmjs.com/package/@typescript-eslint/eslint-plugin)
+      - [@typescript-eslint/parser](https://www.npmjs.com/package/@typescript-eslint/parser)
+      - [@vitejs/plugin-react](https://www.npmjs.com/package/@vitejs/plugin-react)
+      - [eslint](https://www.npmjs.com/package/eslint)
+      - [eslint-plugin-react-hooks](https://www.npmjs.com/package/eslint-plugin-react-hooks)
+      - [eslint-plugin-react-refresh](https://www.npmjs.com/package/esint-plugin-react-refresh)
+      - [typescript](https://www.npmjs.com/package/typescript)
+      - [vite](https://www.npmjs.com/package/vite)
+
 # 8.3 Schutz gegen XSS-Attacken
-    
+
+React ist von sich aus bereits gegen XSS-Attacken geschützt. Dies ist der Fall, da React die Eingaben der Benutzer automatisch "escaped". Auch haben wir darauf geachtet, in JavaScript immer das innerText-Attribut zu verwenden, anstelle des innerHTML-Attributes. Dies bedeutet, dass die Eingaben der Benutzer nicht als HTML-Code interpretiert werden, sondern als Text. 
+
 # 8.4 Zugangsdaten
 
 For the sake of fulfilling the requirement 8.4, two users will be seeded for testing purposes. These are their login information:
