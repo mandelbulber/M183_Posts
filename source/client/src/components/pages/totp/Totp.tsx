@@ -24,9 +24,7 @@ export const Totp: FC = () => {
 
   fetch("/api/auth/totp/setup").then((response) => {
     if (response.status === 200) {
-        console.log("Koni")
       response.json().then((data) => {
-        console.log(data);
         document.getElementById("QrCode")!.setAttribute("src", data.qr);
         document.getElementsByName("totpSecret")[0].setAttribute("value", data.secret);
       });

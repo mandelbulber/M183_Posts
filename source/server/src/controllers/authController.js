@@ -156,7 +156,6 @@ export const checkRecoveryCodeCorrect = async (username, recoveryCode) => {
 
                 // delete recovery code
                 recoveryCodesArray.splice(i, 1);
-                console.log("spliced: " + recoveryCodesArray);
                 await User.update({
                     recoveryCodes: JSON.stringify(recoveryCodesArray)
                 }, {
@@ -457,7 +456,6 @@ export const updatePhoneNumber = async (username, smsToken) => {
             }
         }],
     });
-    console.log(JSON.stringify(phoneNumberUpdateRequest));
 
     if (!phoneNumberUpdateRequest) {
         logger.debug(`AuthController: Could not found phone number request for '${username}' with corresponding sms token`);

@@ -9,8 +9,6 @@ import { Status } from '../models/status.js';
 
 export const postRouter = express.Router();
 
-// TODO: Add authentication where needed
-
 postRouter.get('/', async (req, res) => {
     const posts = await getAllPublishedPosts().catch((err) => {
         logger.error('Post: Error while getting all published posts' + err);
